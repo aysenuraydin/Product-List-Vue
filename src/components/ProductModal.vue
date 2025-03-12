@@ -1,7 +1,6 @@
 <script setup lang="ts">
   import { defineProps, defineEmits, reactive, ref } from 'vue';
   import Dialog from "primevue/dialog";
-  // import FileUpload from 'primevue/fileupload';
   import Button from "primevue/button";
   import ConfirmDialog from "primevue/confirmdialog";
   import Toast from "primevue/toast";
@@ -80,7 +79,7 @@
       @update:visible="emit('update:visible', $event)"
       pt:root:class="!border-0"
       pt:mask:class="backdrop-blur-sm !border"
-      class="lg:w-[40rem]"
+      class="md:w-[43rem]"
       modal>
       <form class="flex flex-col sm:flex-row">
         <div class="card p-3 min-w-40 sm:w-40 sm:max-h-[34rem] max-h-[8rem] sm:overflow-scroll overflow-x-scroll border sm:border-none border-gray-300 rounded-2xl mx-5">
@@ -108,28 +107,28 @@
             <a-input v-model:value="data.name" placeholder="Basic usage" />
           </div>
           <div class="flex">
-            <div class="pt-2 text-sm w-24">Price</div>
+            <div class="pt-4 text-sm w-24">Price</div>
             <a-input class="!mt-3" prefix="$" suffix="USD" v-model:value="data.price"/>
           </div>
           <div class="flex">
-            <div class="pt-2 text-sm w-24">Stock</div>
+            <div class="pt-4 text-sm w-24">Stock</div>
             <a-input-number  v-model:value="data.stockAmount" :min="1" :max="100" class="!w-full !mt-3"/>
           </div>
           <div class="flex">
-            <div class="pt-2 text-sm w-24">Category </div>
+            <div class="pt-4 text-sm w-24">Category </div>
             <a-select   v-model:value="data.category" :options="options" :getPopupContainer="(triggerNode: HTMLElement) => triggerNode.parentNode" class="!w-full !mt-3"></a-select>
           </div>
           <div class="flex">
-            <div class="pt-2 text-sm w-20">Confirm</div>
+            <div class="pt-4 text-sm w-20">Confirm</div>
             <a-checkbox v-model:checked="data.isConfirmed" class="!mt-3"/>
           </div>
           <div class="flex">
-            <div class="pt-2 text-sm w-24">Description </div>
+            <div class="pt-4 text-sm w-24">Description </div>
             <Editor v-model="data.description" editorStyle="height: 150px" class="!mt-3 w-full"/>
           </div>
             <div class="flex !space-x-1 !mt-4 pl-20">
-                <Button @click="requireConfirmation()" label="Save" class="!bg-gray-800 !border-none !outline-0"></Button>
-                <Button @click="requireConfirmation()" label="Save" class="!bg-gray-800 !border-none !outline-0"></Button>
+                <Button @click="requireConfirmation()" label="Save" class="!bg-gray-800 !border-none !outline-0 w-1/2"></Button>
+                <Button @click="requireConfirmation()" label="Save" class="!bg-gray-800 !border-none !outline-0 w-1/2"></Button>
             </div>
         </div>
       </form>

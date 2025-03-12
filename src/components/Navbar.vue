@@ -28,7 +28,7 @@ const visible = ref(false);
       </div>
       <a-space wrap class="sm:mt-0 mt-3 pb-2">
         <a-button block v-if="true">
-          <RouterLink to="/admin" class="relative pl-5">
+          <RouterLink to="/admin/product" class="relative pl-5">
             <UserOutlined class="!absolute left-0 top-0" />Admin Panel
           </RouterLink>
         </a-button>
