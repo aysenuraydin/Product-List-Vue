@@ -1,27 +1,26 @@
 <script lang="ts" setup>
-import { h } from 'vue';
+import { RouterLink } from 'vue-router';
 </script>
+
 <template>
-  <a-anchor
-    class="w-inherit scale-110"
-    :items="[
-      {
-        key: 'part-1 ',
-        href: '#part-1',
-        title: () => h('span', { style: 'color: red' }, 'Part 1 Part 1'),
-      },
-      {
-        key: 'part-2',
-        href: '#part-2',
-        title: 'Part 2 Part 2',
-      },
-      {
-        key: 'part-3',
-        href: '#part-3',
-        title: 'Part 3 Part 3',
-      },
-    ]"
-  />
+  <RouterLink :to="{ name: 'product-list',  query: { query: 'imac' }}">
+    <a-button block>iMac</a-button>
+  </RouterLink>
+  <RouterLink :to="{ name: 'product-list', query:{ query:'macbook' }}">
+    <a-button block style="margin-top: 7px;">Macbook</a-button>
+  </RouterLink>
+  <RouterLink :to="{ name: 'product-list', query:{ query:'ipad' }}">
+    <a-button block style="margin-top: 7px;">iPad</a-button>
+  </RouterLink>
+  <RouterLink :to="{ name: 'product-list', query:{ query:'iphone' }}">
+    <a-button block style="margin-top: 7px;">iPhone</a-button>
+  </RouterLink>
+  <RouterLink :to="{ name: 'product-list', query:{ query:'watch' }}">
+    <a-button block style="margin-top: 7px;">Watch</a-button>
+  </RouterLink>
+  <RouterLink :to="{ name: 'product-list', query:{ query:'airpods' }}">
+    <a-button block style="margin-top: 7px;">AirPods</a-button>
+  </RouterLink>
 </template>
 
 

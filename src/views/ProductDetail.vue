@@ -5,6 +5,7 @@
     name: 'John Brown',
     price: 1200,
     description: 'deneme',
+    rating:4,
     categoryId: 1,
     category: "Electronics",
     isConfirmed: true,
@@ -43,6 +44,7 @@
       <div class="text-gray-500" v-html="data.description"></div>
     </div>
     <div class="w-1/3">
+      <a-rate :value="data.rating" disabled style="width: 120%; margin-bottom: 10px;"/>
       <h1 class="text-2xl">$ {{ data.price }}</h1>
       <a-button class="w-full !bg-gray-800 !text-white">
         <ShoppingOutlined :style="{ fontSize: '18px'}" />
