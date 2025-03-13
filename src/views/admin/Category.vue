@@ -1,89 +1,80 @@
-<script setup>
-import { ref } from 'vue';
-import { useToast } from "primevue/usetoast";
-import { useConfirm } from "primevue/useconfirm";
-import Toast from "primevue/toast";
-import ConfirmPopup from "primevue/confirmpopup";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
+<script setup lang="ts">
+  import { ref, watch } from 'vue';
+  import { useToast } from "primevue/usetoast";
+  import { useConfirm } from "primevue/useconfirm";
+  import Toast from "primevue/toast";
+  import ConfirmPopup from "primevue/confirmpopup";
+  import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
+  import { useCategoryStore } from '@/stores/CategoryStore';
+  import type { ICategory } from '@/models/ICategory';
 import CategoryModal from '@/components/CategoryModal.vue';
-const pageSize = ref(5);
-const currentPage = ref(1);
-const visible = ref(false);
 
-const columns = [
-  { title: 'Id', dataIndex: 'id', key: 'id', fixed: 'left', width:60},
-  { title: 'Name', dataIndex: 'name', key: 'name', fixed: 'left'},
-  { title: 'Color', dataIndex: 'color', key: 'color' },
-  { title: 'CreatedAt', dataIndex: 'createdAt', key: 'createdAt' },
-  { title: 'Action', width: 150, key: 'operation', fixed: 'right'}
-];
+  const pageSize = ref(5);
+  const currentPage = ref(1);
+  const visible = ref(false);
+  const loading = ref(false);
+  const confirm = useConfirm();
+  const toast = useToast();
+  const data = useCategoryStore();
+  const editItem = ref<ICategory>({} as ICategory);
 
-const data = [
-  {
-    id: 1,
-    name: 'iMac',
-    color: "#ef0000",
-    createdAt: Date.now()+ Math.floor(Math.random() * 1000),
-  },
-  {
-    id: 2,
-    name: 'Macbook',
-    color: "#ef0000",
-    createdAt: Date.now()+ Math.floor(Math.random() * 1000),
-  },
-  {
-    id: 3,
-    name: 'iPad',
-    color: "#ef0000",
-    createdAt: Date.now()+ Math.floor(Math.random() * 1000),
-  },
-  {
-    id: 4,
-    name: 'iPhone',
-    color: "#ef0000",
-    createdAt: Date.now()+ Math.floor(Math.random() * 1000),
-  },
-  {
-    id: 5,
-    name: 'Watch',
-    color: "#ef0000",
-    createdAt: Date.now()+ Math.floor(Math.random() * 1000),
-  },
-  {
-    id: 6,
-    name: 'AirPods',
-    color: "#ef0000",
-    createdAt: Date.now()+ Math.floor(Math.random() * 1000),
-  },
-];
+  const columns = [
+    { title: 'Id', dataIndex: 'id', key: 'id', fixed: 'left', width:60},
+    { title: 'Name', dataIndex: 'name', key: 'name', fixed: 'left'},
+    { title: 'Color', dataIndex: 'color', key: 'color' },
+    { title: 'CreatedAt', dataIndex: 'createdAt', key: 'createdAt' },
+    { title: 'Action', width: 150, key: 'operation', fixed: 'right'}
+  ];
 
-const confirm = useConfirm();
-const toast = useToast();
-
-const confirm2 = (event) => {
-  confirm.require({
-      target: event.currentTarget,
-      message: 'Do you want to delete this record?',
-      icon: 'pi pi-info-circle',
-      rejectProps: {
-          label: 'Cancel',
-          severity: 'secondary',
-          outlined: true
-      },
-      acceptProps: {
-          label: 'Delete',
-          severity: 'danger'
-      },
-      accept: () => {
-          toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
-      },
-      reject: () => {
-          toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+  const confirm2 = (event: MouseEvent) => {
+    confirm.require({
+        target: event.currentTarget as HTMLElement,
+        message: 'Do you want to delete this record?',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+        },
+        reject: () => {
+            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+  };
+  const changePagination = (page: number) => {
+    currentPage.value = page;
+  };
+  const changePaginationSize = (current: number, size: number) => {
+    pageSize.value = size;
+    currentPage.value = 1;
+  };
+  const openEditModal = (item: ICategory) => {
+    visible.value = true;
+    editItem.value = { ...item };
+  };
+  watch(
+    () => visible.value,
+    (newVisible) => {
+    if (!newVisible) {
+        editItem.value = {
+          id: 0,
+          name: '',
+          color: '',
+          createdAt: 0,
+        }
       }
-  });
-};
-
+    },
+    { immediate: true }
+  );
 </script>
+
 <template >
   <div class="relative">
     <a-divider orientation="left" class="!text-2xl !pb-5">Categories</a-divider>
@@ -96,23 +87,23 @@ const confirm2 = (event) => {
 
     <a-table
       :columns="columns"
-      :data-source="data"
-      :rowKey="record => record.id"
+      :data-source="data.items"
+      :rowKey="(record:any) => record.id"
       :scroll="{ x: 100 }"
       :expand-column-width="50"
+      :loading="loading"
       :pagination="{
-        current: currentPage.value,
-        pageSize: pageSize.value,
+        current: currentPage,
+        pageSize: pageSize,
         pageSizeOptions: [5, 10, 20, 50],
         showSizeChanger: true,
         showQuickJumper: true,
-        total: data.length,
-      }"
+        total: data.items?.length,
+        onChange: changePagination,
+        onShowSizeChange: changePaginationSize
+        }"
     >
-      <template #bodyCell="{ column, record }">
-        <template v-if="column.key === 'name'">
-          <span class="bf-red-400">{{ record.name }}</span>
-        </template>
+    <template #bodyCell="{ column, record }">
         <template v-if="column.key === 'color'">
           <a-tag :color="record.color">{{ record.color }}</a-tag>
         </template>
@@ -125,20 +116,25 @@ const confirm2 = (event) => {
             <Toast />
             <ConfirmPopup></ConfirmPopup>
             <div class="card flex flex-wrap gap-2 justify-center">
-                <a-button class="!w-full relative">
+                <a-button @click="openEditModal(record)"
+                class="!w-full !bg-gray-800 relative !text-white !border-none">
                   <EditOutlined class="!absolute left-5 top-2"/> Edit
                 </a-button>
-                <a-button class="!w-full !bg-gray-800 relative !border-none" @click="confirm2($event)" danger>
+                <a-button class="!w-full relative" @click="confirm2($event)" danger>
                   <DeleteOutlined class="!absolute left-5 top-2"/> Delete
                 </a-button>
             </div>
         </template>
       </template>
+
     </a-table>
   </div>
-  <CategoryModal :visible="visible" @update:visible="visible = $event" />
+  <CategoryModal
+    :editItem="editItem ?? undefined"
+    :visible="visible"
+    @update:visible="visible = $event"
+  />
 </template>
-
 
 <style>
   .ant-pagination-options {
@@ -148,4 +144,3 @@ const confirm2 = (event) => {
     min-width: 100px !important;
   }
 </style>
-
