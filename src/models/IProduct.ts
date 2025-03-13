@@ -2,12 +2,14 @@ export interface IProduct {
   id: number
   name: string
   price: number
+  raiting: number
   description: string
   categoryId: number
   isConfirmed: boolean
-  createdAt: Date
+  createdAt: number
   stockAmount: number
-  imgUrl: Array<string>
+  tags: string[]
+  imgUrls: string[]
 }
 
 

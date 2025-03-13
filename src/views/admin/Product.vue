@@ -1,190 +1,110 @@
-<script setup>
-import { ref } from 'vue';
-import Rating from 'primevue/rating';
-import Tag from 'primevue/tag';
-import ImageLorem from '@/components/ImageLorem.vue';
-import { useToast } from "primevue/usetoast";
-import { useConfirm } from "primevue/useconfirm";
-import Toast from "primevue/toast";
-import ConfirmPopup from "primevue/confirmpopup";
-import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
-import ProductModal from '@/components/ProductModal.vue';
+<script setup lang="ts">
+  import { computed, ref, watch } from 'vue';
+  import Tag from 'primevue/tag';
+  import ImageLorem from '@/components/ImageLorem.vue';
+  import { useToast } from "primevue/usetoast";
+  import { useConfirm } from "primevue/useconfirm";
+  import Toast from "primevue/toast";
+  import ConfirmPopup from "primevue/confirmpopup";
+  import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
+  import ProductModal from '@/components/ProductModal.vue';
+  import { useProductStore } from '@/stores/ProductStore';
+  import { useCategoryStore } from '@/stores/CategoryStore';
+  import type { ICategory } from '@/models/ICategory';
+  import type { IProduct } from '@/models/IProduct';
 
-const pageSize = ref(5);
-const currentPage = ref(1);
-const visible = ref(false);
+  const pageSize = ref(5);
+  const currentPage = ref(1);
+  const visible = ref(false);
+  const loading = ref(false);
+  const data = useProductStore();
+  const categories = useCategoryStore();
+  const confirm = useConfirm();
+  const toast = useToast();
+  const editItem = ref<IProduct>({} as IProduct);
 
-const formatCurrency = (value) => {
-  return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-};
-const getSeverity = (stockAmount) =>
-  stockAmount >= 10 ? "success" :
-  stockAmount > 0 ? "warn" :
-  stockAmount == 0 ? "danger" :
-  null;
+  const formatCurrency = (value:number) => {
+    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
+  };
+  const getSeverity = (stockAmount:number) :string  =>
+    stockAmount >= 10 ? "success" :
+    stockAmount > 0 ? "warn" :
+    stockAmount == 0 ? "danger" : "";
 
-
-const columns = [
-  { title: 'Id', dataIndex: 'id', key: 'id', fixed: 'left', width:60},
-  { title: 'Image', width: 150, dataIndex: 'image', key: 'image', fixed: 'left' },
-  { title: 'Full Name', dataIndex: 'name', key: 'name' },
-  { title: 'Price', dataIndex: 'price', key: 'price' },
-  { title: 'Rating', dataIndex: 'rating', key: 'rating' },
-  { title: 'Category', dataIndex: 'category', key: 'category' },
-  { title: 'is Confirmed', dataIndex: 'isConfirmed', key: 'isConfirmed' },
-  { title: 'Stock Amount', dataIndex: 'stockAmount', key: 'stockAmount' },
-  { title: 'Action', width: 150, key: 'operation', fixed: 'right' }
-];
-
-
-const data = [
-    {
-      id: 1,
-      name: 'John Brown',
-      price: 1200,
-      rating:1,
-      description: 'Lorem ipsum dolor sit amet consectetur adipisicing elit. Voluptate omnis praesentium sunt architecto enim. Corporis explicabo consequatur molestiae distinctio, natus impedit error vitae. Dolorum laboriosam beatae at delectus maxime molestiae deleniti facilis aspernatur quaerat dolor necessitatibus expedita, eum corrupti nobis soluta, nesciunt, ut impedit saepe magnam tempora! Voluptate, corrupti aspernatur.',
-      categoryId: 1,
-      category: "Electronics",
-      isConfirmed: false,
-      createdAt: "2021-09-01",
-      stockAmount: 9,
-      image: [
-        { uid: '1', url: "https://dummyimage.com/600x500/ccc/aaa", name: "image-1" },
-        { uid: '2', url: "https://dummyimage.com/600x700/ccc/bbb", name: "image-2" },
-        { uid: '3', url: "https://dummyimage.com/600x700/ccc/ccc", name: "image-3" }
-      ],
-    },
-    {
-      id: 2,
-      name: 'John Brown',
-      price: 1200,
-      rating:5,
-      description: 'deneme',
-      categoryId: 1,
-      category: "Electronics",
-      isConfirmed: false,
-      createdAt: "2021-09-01",
-      stockAmount: 0,
-      image: [
-        { uid: '1', url: "https://dummyimage.com/600x500/ccc/aaa", name: "image-1" },
-        { uid: '2', url: "https://dummyimage.com/600x700/ccc/bbb", name: "image-2" },
-        { uid: '3', url: "https://dummyimage.com/600x700/ccc/ccc", name: "image-3" }
-      ],
-    },
-    {
-      id: 3,
-      name: 'John Brown',
-      price: 1200,
-      rating:5,
-      description: 'deneme',
-      categoryId: 1,
-      category: "Electronics",
-      isConfirmed: true,
-      createdAt: "2021-09-01",
-      stockAmount: 10,
-      image: [
-        { uid: '1', url: "https://dummyimage.com/600x500/ccc/aaa", name: "image-1" },
-        { uid: '2', url: "https://dummyimage.com/600x700/ccc/bbb", name: "image-2" },
-        { uid: '3', url: "https://dummyimage.com/600x700/ccc/ccc", name: "image-3" }
-      ],
-    },
-    {
-      id: 4,
-      name: 'John Brown',
-      price: 1200,
-      rating:5,
-      description: 'deneme',
-      categoryId: 1,
-      category: "Electronics",
-      isConfirmed: true,
-      createdAt: "2021-09-01",
-      stockAmount: 10,
-      image: [
-        { uid: '1', url: "https://dummyimage.com/600x500/ccc/aaa", name: "image-1" },
-        { uid: '2', url: "https://dummyimage.com/600x700/ccc/bbb", name: "image-2" },
-        { uid: '3', url: "https://dummyimage.com/600x700/ccc/ccc", name: "image-3" }
-      ],
-    },
-    {
-      id: 5,
-      name: 'John Brown',
-      price: 1200,
-      rating:5,
-      description: 'deneme',
-      categoryId: 1,
-      category: "Electronics",
-      isConfirmed: true,
-      createdAt: "2021-09-01",
-      stockAmount: 10,
-      image: [
-        { uid: '1', url: "https://dummyimage.com/600x500/ccc/aaa", name: "image-1" },
-        { uid: '2', url: "https://dummyimage.com/600x700/ccc/bbb", name: "image-2" },
-        { uid: '3', url: "https://dummyimage.com/600x700/ccc/ccc", name: "image-3" }
-      ],
-    },
-    {
-      id: 6,
-      name: 'John Brown',
-      price: 1200,
-      rating:5,
-      description: 'deneme',
-      categoryId: 1,
-      category: "Electronics",
-      isConfirmed: true,
-      createdAt: "2021-09-01",
-      stockAmount: 10,
-      image: [
-        { uid: '1', url: "https://dummyimage.com/600x500/ccc/aaa", name: "image-1" },
-        { uid: '2', url: "https://dummyimage.com/600x700/ccc/bbb", name: "image-2" },
-        { uid: '3', url: "https://dummyimage.com/600x700/ccc/ccc", name: "image-3" }
-      ],
-    },
-    {
-      id: 7,
-      name: 'John Brown',
-      price: 1200,
-      rating:5,
-      description: 'deneme',
-      categoryId: 1,
-      category: "Electronics",
-      isConfirmed: true,
-      createdAt: "2021-09-01",
-      stockAmount: 10,
-      image: [
-        { uid: '1', url: "https://dummyimage.com/600x500/ccc/aaa", name: "image-1" },
-        { uid: '2', url: "https://dummyimage.com/600x700/ccc/bbb", name: "image-2" },
-        { uid: '3', url: "https://dummyimage.com/600x700/ccc/ccc", name: "image-3" }
-      ],
-    },
+  const columns = [
+    { title: 'Id', dataIndex: 'id', key: 'id', fixed: 'left', width:60},
+    { title: 'Image', width: 150, dataIndex: 'image', key: 'image', fixed: 'left' },
+    { title: 'Full Name', dataIndex: 'name', key: 'name' },
+    { title: 'Price', dataIndex: 'price', key: 'price' },
+    { title: 'Raiting', dataIndex: 'raiting', key: 'raiting', width:200 },
+    { title: 'Category', dataIndex: 'categoryId', key: 'categoryId' },
+    { title: 'Confirm?', dataIndex: 'isConfirmed', key: 'isConfirmed', width:100  },
+    { title: 'Stock Amount', dataIndex: 'stockAmount', key: 'stockAmount' },
+    { title: 'Action', width: 150, key: 'operation', fixed: 'right' }
   ];
+  const getCategory = (id: number): ICategory | undefined => {
+    return categories.items.find(c => c.id === id) ?? {
+      id: 0,
+      name: "Unknown",
+      createdAt: Date.now(),
+      color: "gray"
+    };
+  };
 
-const confirm = useConfirm();
-const toast = useToast();
-
-const confirm2 = (event) => {
-  confirm.require({
-      target: event.currentTarget,
-      message: 'Do you want to delete this record?',
-      icon: 'pi pi-info-circle',
-      rejectProps: {
-          label: 'Cancel',
-          severity: 'secondary',
-          outlined: true
-      },
-      acceptProps: {
-          label: 'Delete',
-          severity: 'danger'
-      },
-      accept: () => {
-          toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
-      },
-      reject: () => {
-          toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+  const confirm2 = (event: MouseEvent) => {
+    confirm.require({
+        target: event.currentTarget as HTMLElement,
+        message: 'Do you want to delete this record?',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+        },
+        reject: () => {
+            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+  };
+  const changePagination = (page: number) => {
+    currentPage.value = page;
+  };
+  const changePaginationSize = (current: number, size: number) => {
+    pageSize.value = size;
+    currentPage.value = 1;
+  };
+  const openEditModal = (item: IProduct) => {
+    visible.value = true;
+    editItem.value = { ...item };
+  };
+  watch(
+    () => visible.value,
+    (newVisible) => {
+    if (!newVisible) {
+        editItem.value = {
+          id: 0,
+          name: '',
+          price: 0,
+          description: '',
+          categoryId: 0,
+          raiting: 0,
+          isConfirmed: true,
+          createdAt: 0,
+          stockAmount: 0,
+          tags: [],
+          imgUrls: [],
+        }
       }
-  });
-};
-
+    },
+    { immediate: true }
+  );
 </script>
 <template >
   <div class="relative">
@@ -198,48 +118,62 @@ const confirm2 = (event) => {
 
     <a-table
       :columns="columns"
-      :data-source="data"
-      :rowKey="record => record.id"
-      :scroll="{ x: 1500 }"
+      :data-source="data.items"
+      :rowKey="(record: any) => record.id"
+      :scroll="{ x: 'max-content' }"
       :expand-column-width="50"
+      :loading="loading"
       :pagination="{
-        current: currentPage.value,
-        pageSize: pageSize.value,
+        current: currentPage,
+        pageSize: pageSize,
         pageSizeOptions: [5, 10, 20, 50],
         showSizeChanger: true,
         showQuickJumper: true,
-        total: data.length,
-      }"
+        total: data.items?.length,
+        onChange: changePagination,
+        onShowSizeChange: changePaginationSize
+        }"
     >
-      <template #bodyCell="{ column, record }">
+    <template #bodyCell="{ column, record }: { column: any, record: any }">
         <template v-if="column.key === 'image'">
           <a-image
-          v-if="record.image && record.image[0].url.length > 0"
-          :width="100" :src="record?.image[0].url" :alt="record.name" style="width: 100px; height: 100%; object-fit: contain; border-radius: 8px;"/>
+          v-if="record.imgUrls && record.imgUrls[0]?.length > 0"
+          :width="100"
+          :src="(record?.imgUrls[0] && record?.imgUrls[0]?.length > 0) ? record?.imgUrls[0] : 'https://dummyimage.com/600x500/ccc/aaa'"
+          :alt="record.name"
+          style="width: 100px; height: 100%; object-fit: contain; border-radius: 8px;"/>
           <ImageLorem v-else :width="100" class="rounded"/>
         </template>
         <template v-else-if="column.key === 'price'">
           {{ formatCurrency(record.price) }}
         </template>
-        <template v-else-if="column.key === 'rating'">
-          <Rating :modelValue="record.rating" readonly />
+        <template v-else-if="column.key === 'categoryId'">
+          <a-tag :color="'#'+getCategory(record.categoryId)?.color">
+            <div class="!text-[15px] !px-4 !py-[5px]">
+              {{ getCategory(record.categoryId)?.name }}
+            </div>
+          </a-tag>
+        </template>
+        <template v-else-if="column.key === 'raiting'">
+          <a-rate :value="record.raiting" disabled style=" margin-bottom: 10px;"/>
         </template>
         <template v-else-if="column.key === 'isConfirmed'">
-         <div class="text-center pr-10">
-          <a-checkbox v-model:checked="record.isConfirmed" disabled style="scale:150%"/>
-         </div>
+          <div class="text-center pr-10">
+            <a-checkbox v-model:checked="record.isConfirmed" disabled style="scale:150%"/>
+          </div>
         </template>
         <template v-else-if="column.key === 'stockAmount'">
-          <Tag :value="record.stockAmount" :severity="getSeverity(record.stockAmount)" class="!w-28" />
+          <Tag :value="record.stockAmount" :severity="getSeverity(record.stockAmount)" class="!w-28 !px-4 !py-[5px]" />
         </template>
         <template v-else-if="column.key === 'operation'">
             <Toast />
             <ConfirmPopup></ConfirmPopup>
             <div class="card flex flex-wrap gap-2 justify-center">
-                <a-button class="!w-full relative">
+                <a-button @click="openEditModal(record)"
+                class="!w-full !bg-gray-800 relative !text-white !border-none">
                   <EditOutlined class="!absolute left-5 top-2"/> Edit
                 </a-button>
-                <a-button class="!w-full !bg-gray-800 relative !border-none" @click="confirm2($event)" danger>
+                <a-button class="!w-full relative" @click="confirm2($event)" danger>
                   <DeleteOutlined class="!absolute left-5 top-2"/> Delete
                 </a-button>
             </div>
@@ -249,10 +183,13 @@ const confirm2 = (event) => {
       <template #expandedRowRender="{ record }">
         <div class="p-10">
         <div class="w-full overflow-scroll flex gap-3">
-          <div v-for="(item, index) in record.image" :key="index">
+          <div v-for="(item, index) in record.imgUrls" :key="index">
             <a-image
-            v-if="item?.url && item.url?.length > 0"
-            :width="100" :src="item?.url" style="height: 100px; width: 100px; object-fit: cover; border-radius: 6px; border:1px solid #bcbcbc" />
+            v-if="item && item?.length > 0"
+              :width="100"
+              :src="(item && item?.length > 0) ? item : 'https://dummyimage.com/600x500/ccc/aaa'"
+              style="height: 100px; width: 100px; object-fit: cover; border-radius: 6px; border:1px solid #bcbcbc"
+            />
             <ImageLorem v-else :width="100" class="rounded !border-gray-400"/>
           </div>
         </div>
@@ -264,13 +201,21 @@ const confirm2 = (event) => {
         <p style="margin: 0">
           {{ record.description }}
         </p>
+        <div v-for="(tag) in record.tags" :key="tag" class="!inline-block mt-5">
+          <a-tag style="margin: 5px;">
+            # {{ tag }}
+          </a-tag>
+        </div>
         </div>
       </template>
     </a-table>
   </div>
-  <ProductModal :visible="visible" @update:visible="visible = $event" />
+  <ProductModal
+    :editItem="editItem"
+    :visible="visible"
+    @update:visible="visible = $event"
+  />
 </template>
-
 
 <style>
   .ant-pagination-options {
@@ -280,3 +225,15 @@ const confirm2 = (event) => {
     min-width: 100px !important;
   }
 </style>
+
+
+
+
+
+
+
+
+
+
+
+

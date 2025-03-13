@@ -44,7 +44,9 @@ const removeItem = (product) => {
 
       <Column header="Image">
         <template #body="slotProps">
-          <a-image v-if="slotProps.data.image" :width="100" :src="`${slotProps.data.image}`" :alt="slotProps.data.name" class="rounded" />
+          <a-image v-if="slotProps.data.image" :width="100"
+          :src="(slotProps.data.image && slotProps.data.image?.length > 0) ? slotProps.data.image : 'https://dummyimage.com/600x500/ccc/aaa'"
+          :alt="slotProps.data.name" class="rounded" />
           <ImageLorem v-else :width="100" class="rounded"/>
         </template>
       </Column>

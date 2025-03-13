@@ -1,9 +1,8 @@
-export interface IProduct {
+export interface ICategory {
   id: number
   name: string
   color: string
-  class: string
-  createdAt: Date
+  createdAt: number
 }
 
 

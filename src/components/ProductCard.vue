@@ -8,19 +8,24 @@ defineProps({
 <template>
   <a-card hoverable style="margin: '15px 10px'; width: '100%'">
     <template #cover>
-      <img
-        alt="example"
-        :src="productData.image[0].url"
-      />
+      <RouterLink :to="{ name: 'productDetail', params: { id: productData.id }}">
+        <img
+          alt="example"
+          :src="productData.imgUrls[0]"
+          class="p-2 object-contain h-40"
+        />
+      </RouterLink>
     </template>
     <template #actions>
-      <ShoppingOutlined :style="{ fontSize: '18px'}" />
+      <RouterLink :to="{ name: 'cart'}">
+        <ShoppingOutlined :style="{ fontSize: '18px'}" />
+      </RouterLink>
       <HeartOutlined :style="{ fontSize: '18px'}" />
     </template>
-    <a-rate :value="productData.rating" disabled style="width: 120%; margin-bottom: 10px;"/>
     <RouterLink :to="{ name: 'productDetail', params: { id: productData.id }}">
       <a-card-meta :title="productData.name"></a-card-meta>
     </RouterLink>
+    <a-rate :value="productData.raiting" disabled style="width: 120%; margin-top: 10px;"/>
   </a-card>
 </template>
 
