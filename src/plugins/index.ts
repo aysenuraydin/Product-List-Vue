@@ -4,7 +4,6 @@ import Antd from './antd';
 import PrimeVue from './primevue';
 import Icons from './icons';
 import ConfirmationService from 'primevue/confirmationservice';
-import ToastService from 'primevue/toastservice';
 import Components from './components';
 
 export default function registerPlugins(app: App) {
@@ -13,7 +12,6 @@ export default function registerPlugins(app: App) {
   Icons(app);
   Components(app);
   app.use(ConfirmationService);
-  app.use(ToastService);
 }
 
 

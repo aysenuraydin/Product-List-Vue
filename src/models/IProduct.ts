@@ -1,10 +1,10 @@
 export interface IProduct {
-  id: number
+  id: string
   name: string
   price: number
   raiting: number
   description: string
-  categoryId: number
+  categoryId: string
   isConfirmed: boolean
   createdAt: number
   stockAmount: number

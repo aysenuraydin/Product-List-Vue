@@ -1,67 +1,3 @@
-<script setup lang="ts">
-  import { defineProps, defineEmits, reactive, watch } from 'vue';
-  import Dialog from "primevue/dialog";
-  import Button from "primevue/button";
-  import ConfirmDialog from "primevue/confirmdialog";
-  import Toast from "primevue/toast";
-  import { useConfirm } from "primevue/useconfirm";
-  import { useToast } from "primevue/usetoast";
-  import ColorPicker from 'primevue/colorpicker';
-
-  const data = reactive({
-    id: 0,
-    name: '',
-    color: "#ffffff",
-    createdAt: 0,
-  });
-
-  const props = defineProps({
-    visible: Boolean,
-    editItem: Object
-  });
-
-  watch(
-    () => props.editItem,
-    (newValue) => {
-      if (newValue) {
-        data.id= newValue.id;
-        data.name= newValue.name;
-        data.color= newValue.color;
-        data.createdAt= newValue.createdAt;
-      }
-    },
-    { immediate: true }
-  );
-
-  const emit = defineEmits(["update:visible"]);
-
-  const confirm = useConfirm();
-  const toast = useToast();
-
-  const requireConfirmation = () => {
-  confirm.require({
-      group: 'headless',
-      header: 'Are you sure?',
-      message: 'Please confirm to proceed.',
-      accept: () => {
-          toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
-      },
-      reject: () => {
-          toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-      }
-  });
-  };
-
-  const submitForm = (acceptCallback?: () => void) => {
-    console.log(data);
-    emit('update:visible', false)
-    if (acceptCallback) {
-        acceptCallback();
-    }
-  };
-
-</script>
-
 <template class="card flex justify-center border">
   <Dialog
       :visible="props.visible"
@@ -70,6 +6,7 @@
       pt:mask:class="backdrop-blur-sm !border"
       class="w-full sm:w-[35rem]"
       modal>
+      <h3 class="text-2xl text-center">{{ data.id ? "Edit Product" : "Create Product" }} </h3>
       <form class="flex flex-col sm:flex-row">
         <div class="p-5 w-full mt-5 sm:mt-0">
           <div class="flex">
@@ -99,8 +36,8 @@
                   <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
                   <p class="mb-0">{{ message.message }}</p>
                   <div class="flex items-center gap-2 mt-6">
-                      <Button label="Save" @click="submitForm(acceptCallback)"></Button>
-                      <Button label="Cancel" outlined @click="rejectCallback"></Button>
+                      <Button label="Save" style="background-color: black; border-style: none;" @click="submitForm(acceptCallback)"></Button>
+                      <Button label="Cancel" style="border-color: black; color: black;" outlined @click="rejectCallback"></Button>
                   </div>
               </div>
           </template>
@@ -108,7 +45,65 @@
       <Toast />
   </Dialog>
 </template>
+<script setup lang="ts">
+  import { defineProps, defineEmits, reactive, watch } from 'vue';
+  import Dialog from "primevue/dialog";
+  import Button from "primevue/button";
+  import ConfirmDialog from "primevue/confirmdialog";
+  import Toast from "primevue/toast";
+  import { useConfirm } from "primevue/useconfirm";
+  import { useToast } from "primevue/usetoast";
+  import ColorPicker from 'primevue/colorpicker';
+  import { useCategoryStore } from '@/stores/categoryStore';
 
+  const confirm = useConfirm();
+  const toast = useToast();
+  const emit = defineEmits(["update:visible"]);
+  const categoryStore = useCategoryStore();
+  const data = reactive({
+    id: '',
+    name: '',
+    color: "#ffffff",
+    createdAt: 0,
+  });
+  const props = defineProps({
+    visible: Boolean,
+    editItem: Object
+  });
+
+  watch(
+    () => props.editItem,
+    (newValue) => {
+      if (newValue) {
+        Object.assign(data, {
+          ...newValue
+        });
+      }
+    },
+    { immediate: true }
+  );
+
+  const requireConfirmation = () => {
+    confirm.require({
+        group: 'headless',
+        header: 'Are you sure?',
+        message: 'Please confirm to proceed.',
+        accept: () => {
+            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'You have accepted', life: 3000 });
+        },
+        reject: () => {
+            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+  };
+  const submitForm = (acceptCallback?: () => void) => {
+    categoryStore.saveItem(data);
+    emit('update:visible', false);
+    if (acceptCallback) {
+        acceptCallback();
+    }
+  };
+</script>
 <style scoped>
   .p-dialog-close-button {
     border: 2px solid red !important;

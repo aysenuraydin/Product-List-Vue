@@ -6,6 +6,6 @@
 </script>
 <template>
   <Navbar/>
-  <div class="py-10 pr-5 min-h-screen !pt-24 max-w-[70rem] mx-auto"><RouterView /></div>
+  <div class="py-10 p-3 min-h-screen !pt-24 max-w-[70rem] mx-auto"><RouterView /></div>
   <Footer />
 </template>

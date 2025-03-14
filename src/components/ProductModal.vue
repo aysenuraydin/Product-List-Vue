@@ -8,21 +8,22 @@
   import { useToast } from "primevue/usetoast";
   import Editor from "primevue/editor";
   import { PlusOutlined } from '@ant-design/icons-vue';
-  import Tags from './tags.vue';
-  import { useCategoryStore } from '@/stores/CategoryStore';
+  import Tags from './Tags.vue';
+import { useCategoryStore } from '@/stores/categoryStore';
+import { useProductStore } from '@/stores/productStore';
 
-  const categories = useCategoryStore();
+  const categoryStore = useCategoryStore();
+  const productStore = useProductStore();
   const previewVisible = ref(false);
   const previewImage = ref('');
   const previewTitle = ref('');
-  const doc= ref(document);
 
   const data = reactive({
-    id: 0,
+    id: '',
     name: '',
     price: 0,
     description: '',
-    categoryId: 0,
+    categoryId: '' ,
     raiting: 0,
     category: 'Select Category',
     isConfirmed: false,
@@ -47,7 +48,7 @@
   });
 
   const getCategories = () => {
-    return categories.items?.map(c=> ({
+    return categoryStore.items?.map(c=> ({
       label: c.name,
       value: c.id,
       color:c.color
@@ -56,13 +57,13 @@
 
   const getCategory = computed({
     get: () => {
-      const category = categories.items.find(c => c.id === data.categoryId);
+      const category = categoryStore.items.find(c => c.id === data.categoryId);
       return category
         ? category.id
         : null;
     },
     set: (val) => {
-      data.categoryId = val ?? 0;
+      data.categoryId = val ?? '';
     }
   });
 
@@ -71,30 +72,23 @@
     previewTitle.value = '';
   };
 
-  const handlePreview = async (file: { url?: string }) => {
-    if (!file.url) return;
+  // const handlePreview = async (file: { url?: string }) => {
+  //   if (!file.url) return;
 
-    previewImage.value = file.url;
-    previewVisible.value = true;
-    previewTitle.value = file.url.substring(file.url.lastIndexOf('/') + 1);
-  };
+  //   previewImage.value = file.url;
+  //   previewVisible.value = true;
+  //   previewTitle.value = file.url.substring(file.url.lastIndexOf('/') + 1);
+  // };
 
   watch(
     () => props.editItem,
     (newValue) => {
       if (newValue) {
-        data.id= newValue.id;
-        data.name= newValue.name;
-        data.price= newValue.price;
-        data.raiting= newValue.raiting;
-        data.description= newValue.description;
-        data.categoryId= newValue.categoryId;
-        data.category= newValue.category;
-        data.isConfirmed= newValue.isConfirmed;
-        data.createdAt= newValue.createdAt;
-        data.stockAmount= newValue.stockAmount;
-        data.tags= newValue.tags?? [];
-        data.imgUrls= newValue.imgUrls?? [];
+        Object.assign(data, {
+          ...newValue,
+          tags: newValue.tags ?? [],
+          imgUrls: newValue.imgUrls ?? [],
+        });
       }
     },
     { immediate: true }
@@ -133,7 +127,7 @@
   };
 
   const submitForm = (acceptCallback?: () => void) => {
-    console.log(data);
+    productStore.saveItem(data);
     emit('update:visible', false)
     if (acceptCallback) {
         acceptCallback();
@@ -150,7 +144,6 @@
   pt:mask:class="backdrop-blur-sm !border"
   class="md:w-[43rem]"
   modal>
-
       <h3 class="text-2xl text-center">{{ data.id ? "Edit Product" : "Create Product" }}
       </h3>
       <form class="flex flex-col sm:flex-row">
@@ -196,7 +189,7 @@
           </div>
           <div class="flex !items-start">
             <div class="pt-4 text-sm w-24">Tags</div>
-            <div class="!w-full !mt-3"> <Tags :tags="data.tags"/></div>
+            <div class="!w-full !mt-3"> <Tags v-model:modelValue="data.tags"/></div>
           </div>
           <div class="flex my-2" v-if="data.raiting">
             <div class="text-sm w-20">Raiting</div>
@@ -221,8 +214,8 @@
                   <span class="font-bold text-2xl block mb-2 mt-6">{{ message.header }}</span>
                   <p class="mb-0">{{ message.message }}</p>
                   <div class="flex items-center gap-2 mt-6">
-                      <Button label="Save" @click="submitForm(acceptCallback)"></Button>
-                      <Button label="Cancel" outlined @click="rejectCallback"></Button>
+                      <Button label="Save" style="background-color: black; border-style: none;" @click="submitForm(acceptCallback)"></Button>
+                      <Button label="Cancel" style="border-color: black; color: black;" outlined @click="rejectCallback"></Button>
                   </div>
               </div>
           </template>
@@ -230,17 +223,3 @@
       <Toast />
   </Dialog>
 </template>
-
-<style scoped>
-  .file-card {
-    scrollbar-width: none !important;
-    -ms-overflow-style: none !important;
-  }
-  .file-card::-webkit-scrollbar {
-    display: none !important;
-  }
-  .p-dialog.p-component {
-  border: 2px solid red !important;
-}
-/* class="p-dialog p-component md:w-[43rem] !border-0" */
-</style>

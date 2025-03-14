@@ -1,7 +1,7 @@
 <template>
   <div>
-    <template v-for="(tag, index) in state.tags" :key="tag">
-      <a-tag  :closable="true" @close="handleClose(tag)" style="margin: 5px;">
+    <template v-for="tag in state.tags" :key="tag">
+      <a-tag :closable="true" @close="handleClose(tag)" style="margin: 5px;">
         {{ tag }}
       </a-tag>
     </template>
@@ -25,25 +25,28 @@
 </template>
 
 <script lang="ts" setup>
-import { ref, reactive, nextTick, watch, defineProps } from 'vue';
+import { ref, reactive, nextTick, watch, defineProps, defineEmits } from 'vue';
 import { PlusOutlined } from '@ant-design/icons-vue';
 
-const props = defineProps<{ tags: string[] }>();
+const props = defineProps<{ modelValue: string[] }>(); // v-model için modelValue tanımlandı
+const emit = defineEmits(["update:modelValue"]);
 
 const state = reactive({
-  tags: [...props.tags],
+  tags: [...props.modelValue],
   inputVisible: false,
   inputValue: '',
 });
 
 const inputRef = ref<HTMLInputElement | null>(null);
 
-watch(() => props.tags, (newTags) => {
+// props.modelValue değiştiğinde state.tags güncellenir
+watch(() => props.modelValue, (newTags) => {
   state.tags = [...newTags];
 });
 
 const handleClose = (removedTag: string) => {
   state.tags = state.tags.filter(tag => tag !== removedTag);
+  emit("update:modelValue", state.tags);
 };
 
 const showInput = () => {
@@ -57,6 +60,7 @@ const handleInputConfirm = () => {
   const inputValue = state.inputValue.trim();
   if (inputValue && !state.tags.includes(inputValue)) {
     state.tags.push(inputValue);
+    emit("update:modelValue", state.tags);
   }
   state.inputVisible = false;
   state.inputValue = '';

@@ -1,6 +1,3 @@
-<script setup lang="ts">
-</script>
-
 <template>
   <a-image class="!w-full"
   src="https://www.antdv.com/#error"

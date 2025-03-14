@@ -1,20 +1,3 @@
-<script setup>
-  import { defineProps, defineEmits } from 'vue';
-  import Dialog from "primevue/dialog";
-  import InputText from "primevue/inputtext";
-  import Button from "primevue/button";
-
-  const props = defineProps({
-    visible: Boolean
-  });
-
-  const emit = defineEmits(["update:visible"]);
-
-  const closeDialog = () => {
-    emit("update:visible", false);
-  };
-</script>
-
 <template>
   <div class="card flex justify-center">
     <Dialog
@@ -43,3 +26,19 @@
     </Dialog>
   </div>
 </template>
+<script setup>
+  import { defineProps, defineEmits } from 'vue';
+  import Dialog from "primevue/dialog";
+  import InputText from "primevue/inputtext";
+  import Button from "primevue/button";
+
+  const props = defineProps({
+    visible: Boolean
+  });
+
+  const emit = defineEmits(["update:visible"]);
+
+  const closeDialog = () => {
+    emit("update:visible", false);
+  };
+</script>
