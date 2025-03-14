@@ -1,3 +1,10 @@
+<template>
+  <Toast />
+  <ConfirmPopup />
+  <component :is="layout">
+    <RouterView />
+  </component>
+</template>
 <script setup lang="ts">
   import Toast from "primevue/toast";
   import ConfirmPopup from "primevue/confirmpopup";
@@ -20,14 +27,5 @@
     { immediate: true }
   );
 </script>
-
-<template>
-  <Toast />
-  <ConfirmPopup />
-  <component :is="layout">
-    <RouterView />
-  </component>
-</template>
-
 <style scoped></style>
 

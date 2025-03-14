@@ -1,10 +1,3 @@
-<script setup lang="ts">
-  import Categories from '@/components/Categories.vue';
-  import ProductCard from '@/components/ProductCard.vue';
-  import { useProductStore } from '@/stores/ProductStore';
-  const data = useProductStore();
-</script>
-
 <template>
   <div class="pb-5 md:flex gap-x-10">
     <div class="md:!w-[15rem] md:p-5 mb-10 md:pb-0 md:pt-5">
@@ -28,6 +21,12 @@
     </div>
   </div>
 </template>
+<script setup lang="ts">
+  import Categories from '@/components/Categories.vue';
+import ProductCard from '@/components/ProductCard.vue';
+  import { useProductStore } from '@/stores/productStore';
+  const data = useProductStore();
+</script>
 <style scoped>
 .gutter-box {
   background: #0092ff;

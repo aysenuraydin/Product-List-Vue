@@ -1,111 +1,3 @@
-<script setup lang="ts">
-  import { computed, ref, watch } from 'vue';
-  import Tag from 'primevue/tag';
-  import ImageLorem from '@/components/ImageLorem.vue';
-  import { useToast } from "primevue/usetoast";
-  import { useConfirm } from "primevue/useconfirm";
-  import Toast from "primevue/toast";
-  import ConfirmPopup from "primevue/confirmpopup";
-  import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
-  import ProductModal from '@/components/ProductModal.vue';
-  import { useProductStore } from '@/stores/ProductStore';
-  import { useCategoryStore } from '@/stores/CategoryStore';
-  import type { ICategory } from '@/models/ICategory';
-  import type { IProduct } from '@/models/IProduct';
-
-  const pageSize = ref(5);
-  const currentPage = ref(1);
-  const visible = ref(false);
-  const loading = ref(false);
-  const data = useProductStore();
-  const categories = useCategoryStore();
-  const confirm = useConfirm();
-  const toast = useToast();
-  const editItem = ref<IProduct>({} as IProduct);
-
-  const formatCurrency = (value:number) => {
-    return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
-  };
-  const getSeverity = (stockAmount:number) :string  =>
-    stockAmount >= 10 ? "success" :
-    stockAmount > 0 ? "warn" :
-    stockAmount == 0 ? "danger" : "";
-
-  const columns = [
-    { title: 'Id', dataIndex: 'id', key: 'id', fixed: 'left', width:60},
-    { title: 'Image', width: 150, dataIndex: 'image', key: 'image', fixed: 'left' },
-    { title: 'Full Name', dataIndex: 'name', key: 'name' },
-    { title: 'Price', dataIndex: 'price', key: 'price' },
-    { title: 'Raiting', dataIndex: 'raiting', key: 'raiting', width:200 },
-    { title: 'Category', dataIndex: 'categoryId', key: 'categoryId' },
-    { title: 'Confirm?', dataIndex: 'isConfirmed', key: 'isConfirmed', width:100  },
-    { title: 'Stock Amount', dataIndex: 'stockAmount', key: 'stockAmount' },
-    { title: 'Action', width: 150, key: 'operation', fixed: 'right' }
-  ];
-  const getCategory = (id: number): ICategory | undefined => {
-    return categories.items.find(c => c.id === id) ?? {
-      id: 0,
-      name: "Unknown",
-      createdAt: Date.now(),
-      color: "gray"
-    };
-  };
-
-  const confirm2 = (event: MouseEvent) => {
-    confirm.require({
-        target: event.currentTarget as HTMLElement,
-        message: 'Do you want to delete this record?',
-        icon: 'pi pi-info-circle',
-        rejectProps: {
-            label: 'Cancel',
-            severity: 'secondary',
-            outlined: true
-        },
-        acceptProps: {
-            label: 'Delete',
-            severity: 'danger'
-        },
-        accept: () => {
-            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
-        },
-        reject: () => {
-            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
-        }
-    });
-  };
-  const changePagination = (page: number) => {
-    currentPage.value = page;
-  };
-  const changePaginationSize = (current: number, size: number) => {
-    pageSize.value = size;
-    currentPage.value = 1;
-  };
-  const openEditModal = (item: IProduct) => {
-    visible.value = true;
-    editItem.value = { ...item };
-  };
-  watch(
-    () => visible.value,
-    (newVisible) => {
-    if (!newVisible) {
-        editItem.value = {
-          id: 0,
-          name: '',
-          price: 0,
-          description: '',
-          categoryId: 0,
-          raiting: 0,
-          isConfirmed: true,
-          createdAt: 0,
-          stockAmount: 0,
-          tags: [],
-          imgUrls: [],
-        }
-      }
-    },
-    { immediate: true }
-  );
-</script>
 <template >
   <div class="relative">
     <a-divider orientation="left" class="!text-2xl !pb-5">Products</a-divider>
@@ -118,7 +10,7 @@
 
     <a-table
       :columns="columns"
-      :data-source="data.items"
+      :data-source="productStore.items"
       :rowKey="(record: any) => record.id"
       :scroll="{ x: 'max-content' }"
       :expand-column-width="50"
@@ -129,7 +21,7 @@
         pageSizeOptions: [5, 10, 20, 50],
         showSizeChanger: true,
         showQuickJumper: true,
-        total: data.items?.length,
+        total: productStore.items?.length,
         onChange: changePagination,
         onShowSizeChange: changePaginationSize
         }"
@@ -145,7 +37,7 @@
           <ImageLorem v-else :width="100" class="rounded"/>
         </template>
         <template v-else-if="column.key === 'price'">
-          {{ formatCurrency(record.price) }}
+          $ {{ record.price }}
         </template>
         <template v-else-if="column.key === 'categoryId'">
           <a-tag :color="'#'+getCategory(record.categoryId)?.color">
@@ -158,12 +50,17 @@
           <a-rate :value="record.raiting" disabled style=" margin-bottom: 10px;"/>
         </template>
         <template v-else-if="column.key === 'isConfirmed'">
-          <div class="text-center pr-10">
+          <div class="text-center">
             <a-checkbox v-model:checked="record.isConfirmed" disabled style="scale:150%"/>
           </div>
         </template>
         <template v-else-if="column.key === 'stockAmount'">
-          <Tag :value="record.stockAmount" :severity="getSeverity(record.stockAmount)" class="!w-28 !px-4 !py-[5px]" />
+          <Tag :value="record.stockAmount" :severity="getSeverity(record.stockAmount)" class="!w-16 !px-4 !py-[5px]" />
+        </template>
+        <template v-else-if="column.key === 'createdAt'">
+          {{
+            new Date(record.createdAt).toISOString().replace("T", " ").substring(0, 19)
+          }}
         </template>
         <template v-else-if="column.key === 'operation'">
             <Toast />
@@ -173,7 +70,7 @@
                 class="!w-full !bg-gray-800 relative !text-white !border-none">
                   <EditOutlined class="!absolute left-5 top-2"/> Edit
                 </a-button>
-                <a-button class="!w-full relative" @click="confirm2($event)" danger>
+                <a-button class="!w-full relative" @click="confirm2($event, record)" danger>
                   <DeleteOutlined class="!absolute left-5 top-2"/> Delete
                 </a-button>
             </div>
@@ -198,9 +95,7 @@
             new Date(record.createdAt).toISOString().replace("T", " ").substring(0, 19)
           }}
         </p>
-        <p style="margin: 0">
-          {{ record.description }}
-        </p>
+        <p style="margin: 0" v-html="record.description"></p>
         <div v-for="(tag) in record.tags" :key="tag" class="!inline-block mt-5">
           <a-tag style="margin: 5px;">
             # {{ tag }}
@@ -216,7 +111,6 @@
     @update:visible="visible = $event"
   />
 </template>
-
 <style>
   .ant-pagination-options {
     width: auto !important;
@@ -225,6 +119,112 @@
     min-width: 100px !important;
   }
 </style>
+<script setup lang="ts">
+  import { ref, watch } from 'vue';
+  import Tag from 'primevue/tag';
+  import ImageLorem from '@/components/ImageLorem.vue';
+  import { useToast } from "primevue/usetoast";
+  import { useConfirm } from "primevue/useconfirm";
+  import Toast from "primevue/toast";
+  import ConfirmPopup from "primevue/confirmpopup";
+  import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
+  import ProductModal from '@/components/ProductModal.vue';
+  import { useProductStore } from '@/stores/productStore';
+  import { useCategoryStore } from '@/stores/categoryStore';
+  import type { ICategory } from '@/models/ICategory';
+  import type { IProduct } from '@/models/IProduct';
+
+  const pageSize = ref(5);
+  const currentPage = ref(1);
+  const visible = ref(false);
+  const loading = ref(false);
+  const confirm = useConfirm();
+  const toast = useToast();
+  const productStore = useProductStore();
+  const categoryStore = useCategoryStore();
+  const editItem = ref<IProduct>({} as IProduct);
+
+  const getSeverity = (stockAmount:number) :string  =>
+    stockAmount >= 10 ? "success" :
+    stockAmount > 0 ? "warn" :
+    stockAmount == 0 ? "danger" : "";
+
+  const columns = [
+    { title: 'Image', width: 150, dataIndex: 'image', key: 'image', fixed: 'left' },
+    { title: 'Full Name', dataIndex: 'name', key: 'name' },
+    { title: 'Price', dataIndex: 'price', key: 'price' },
+    { title: 'Raiting', dataIndex: 'raiting', key: 'raiting', width:200 },
+    { title: 'Category', dataIndex: 'categoryId', key: 'categoryId' },
+    { title: 'Confirm?', dataIndex: 'isConfirmed', key: 'isConfirmed', width:100  },
+    { title: 'Stock Amount', dataIndex: 'stockAmount', key: 'stockAmount' },
+    { title: 'CreatedAt', dataIndex: 'createdAt', key: 'createdAt' },
+    { title: 'Action', width: 150, key: 'operation', fixed: 'right' }
+  ];
+  const getCategory = (id: string): ICategory => {
+    return categoryStore.items.find(c => c.id === id) ?? {
+      id: '',
+      name: "Unknown",
+      createdAt: Date.now(),
+      color: "gray"
+    };
+  };
+  const confirm2 = (event: MouseEvent, item: IProduct) => {
+    confirm.require({
+        target: event.currentTarget as HTMLElement,
+        message: 'Do you want to delete this record?',
+        icon: 'pi pi-info-circle',
+        rejectProps: {
+            label: 'Cancel',
+            severity: 'secondary',
+            outlined: true
+        },
+        acceptProps: {
+            label: 'Delete',
+            severity: 'danger'
+        },
+        accept: () => {
+            productStore.deleteItem(item);
+            toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
+        },
+        reject: () => {
+            toast.add({ severity: 'error', summary: 'Rejected', detail: 'You have rejected', life: 3000 });
+        }
+    });
+  };
+  const changePagination = (page: number) => {
+    currentPage.value = page;
+  };
+  const changePaginationSize = (current: number, size: number) => {
+    pageSize.value = size;
+    currentPage.value = 1;
+  };
+  const openEditModal = (item: IProduct) => {
+    visible.value = true;
+    editItem.value = { ...item };
+  };
+  watch(
+    () => visible.value,
+    (newVisible) => {
+    if (!newVisible) {
+        editItem.value = {
+          id: '',
+          name: '',
+          price: 0,
+          description: '',
+          categoryId: '',
+          raiting: 0,
+          isConfirmed: true,
+          createdAt: 0,
+          stockAmount: 0,
+          tags: [],
+          imgUrls: [],
+        }
+      }
+    },
+    { immediate: true }
+  );
+</script>
+
 
 
 

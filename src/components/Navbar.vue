@@ -1,14 +1,3 @@
-<script setup lang="ts">
-import { ref } from "vue";
-import { RouterLink } from "vue-router";
-import { UserOutlined, DownOutlined, HomeOutlined, ShoppingCartOutlined } from "@ant-design/icons-vue";
-import Button from "primevue/button";
-import LoginPopup from "./LoginPopup.vue";
-import { useCategoryStore } from "@/stores/CategoryStore";
-
-const visible = ref(false);
-const querys = useCategoryStore();
-</script>
 <template>
   <header class="bg-gray-800 text-white fixed top-0 w-full z-50">
     <div class="flex justify-between items-center max-w-[70rem] px-4 py-3 mx-auto">
@@ -47,3 +36,14 @@ const querys = useCategoryStore();
   </header>
   <LoginPopup :visible="visible" @update:visible="visible = $event" />
 </template>
+<script setup lang="ts">
+  import { ref } from "vue";
+  import { RouterLink } from "vue-router";
+  import { UserOutlined, DownOutlined, HomeOutlined, ShoppingCartOutlined } from "@ant-design/icons-vue";
+  import Button from "primevue/button";
+  import LoginPopup from "./LoginPopup.vue";
+  import { useCategoryStore } from "@/stores/categoryStore";
+
+  const visible = ref(false);
+  const querys = useCategoryStore();
+</script>

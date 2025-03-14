@@ -1,7 +1,3 @@
-<script lang="ts" setup>
-import { RouterLink } from 'vue-router';
-</script>
-
 <template>
   <RouterLink to="/admin/product">
     <a-button block>Products</a-button>
@@ -11,3 +7,6 @@ import { RouterLink } from 'vue-router';
     <a-button block style="margin-top: 7px;">Categories</a-button>
   </RouterLink>
 </template>
+<script lang="ts" setup>
+  import { RouterLink } from 'vue-router';
+</script>
