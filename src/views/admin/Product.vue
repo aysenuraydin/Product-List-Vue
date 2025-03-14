@@ -215,7 +215,7 @@
           raiting: 0,
           isConfirmed: true,
           createdAt: 0,
-          stockAmount: 0,
+          stockAmount: 1,
           tags: [],
           imgUrls: [],
         }

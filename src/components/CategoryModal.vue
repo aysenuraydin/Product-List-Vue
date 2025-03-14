@@ -7,24 +7,41 @@
       class="w-full sm:w-[35rem]"
       modal>
       <h3 class="text-2xl text-center">{{ data.id ? "Edit Product" : "Create Product" }} </h3>
-      <form class="flex flex-col sm:flex-row">
-        <div class="p-5 w-full mt-5 sm:mt-0">
-          <div class="flex">
-            <div class="pt-2 text-sm w-24">Name</div>
-            <a-input v-model:value="data.name" placeholder="Name" />
-          </div>
-          <div class="flex mt-2">
-            <div class="pt-2 text-sm w-24">Color</div>
-            <div class="w-full">
-              <a-input v-model:value="data.color" placeholder="Color" :style="{ backgroundColor: '#'+data.color+'99', borderColor: '#'+data.color}" />
-              <div class="md:scale-[205%] md:translate-[calc(53%)] md:h-[22rem] pt-1 scale-[175%] translate-[calc(38%)] h-[19rem]"><ColorPicker v-model="data.color" inline style="width: 100%;"/></div>
-            </div>
-          </div>
-          <div class="flex !space-x-1 !mt-4 pl-20 w-full">
-            <Button @click="requireConfirmation()" :label="data.id ? 'Update' : 'Create'" class="!bg-gray-800 !border-none !outline-0 w-full"></Button>
-          </div>
-          </div>
-      </form>
+      <a-form
+        :model="data"
+        name="basic"
+        :label-col="{span: 4}"
+        :wrapper-col="{ span: 20 }"
+        autocomplete="off"
+        @finish="requireConfirmation"
+        @finishFailed="onFinishFailed"
+        style="padding: 1rem;"
+        layout="horizontal"
+        :disabled="false"
+      >
+        <a-form-item
+          label="Name"
+          name="name"
+          :rules="[{ required: true, message: 'Please input your name!' }]"
+        >
+          <a-input v-model:value="data.name" />
+        </a-form-item>
+
+        <a-form-item
+          label="Color"
+          name="color"
+          :rules="[{ required: true, message: 'Please input your color!' }]"
+        >
+          <a-input v-model:value="data.color" />
+          <div class="md:scale-[205%] md:translate-[calc(53%)] md:h-[22rem] pt-1 scale-[175%] translate-[calc(38%)] h-[19rem]"><ColorPicker v-model="data.color" inline style="width: 100%;"/></div>
+        </a-form-item>
+
+        <a-form-item :wrapper-col="{ offset: 4 }">
+          <a-button type="primary" html-type="submit" class="!bg-gray-800 !border-none !outline-0 w-full">
+            {{ data.id ? 'Update' : 'Create' }}
+          </a-button>
+        </a-form-item>
+      </a-form>
 
       <ConfirmDialog group="headless">
           <template #container="{ message, acceptCallback, rejectCallback }">
@@ -103,9 +120,15 @@
         acceptCallback();
     }
   };
+  const onFinishFailed = (errorInfo: void) => {
+    console.log('Failed:', errorInfo);
+  };
 </script>
 <style scoped>
   .p-dialog-close-button {
+    border: 2px solid red !important;
+  }
+  .ant-form-item-required{
     border: 2px solid red !important;
   }
 </style>
