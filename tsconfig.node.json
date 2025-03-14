@@ -9,6 +9,7 @@
     "eslint.config.*"
   ],
   "compilerOptions": {
+    "lib": ["ES6", "DOM"],
     "noEmit": true,
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.node.tsbuildinfo",
 
