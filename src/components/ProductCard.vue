@@ -3,12 +3,12 @@
     <template #cover>
       <div class="!sm:h-44">
         <RouterLink :to="{ name: 'productDetail', params: { id: productData?.id }}">
-        <img
-          v-if="productData?.imgUrls[0] && productData?.imgUrls[0]?.length > 0"
-          alt="example"
-          :src="productData?.imgUrls[0]"
-          class="p-2 object-contain !h-40 !mx-auto"
-        />
+          <img
+            v-if="productData?.imgUrls && Array.isArray(productData.imgUrls) && productData.imgUrls.length > 0"
+            alt="example"
+            :src="productData.imgUrls[0]"
+            class="p-2 object-contain !h-40 !mx-auto"
+          />
         <div  v-else  class="flex justify-center">
           <ImageLorem class="rounded !border-gray-400 p-2 !object-contain !mx-auto !h-40"/>
         </div>
@@ -34,12 +34,12 @@
   </a-card>
 </template>
 <script setup lang="ts">
-  import { useShoppingCartStore } from '@/stores/shoppingCartStore';
   import { RouterLink } from 'vue-router';
   import router from '@/router'
   import ImageLorem from '@/components/ImageLorem.vue';
+  import { useCartStore } from '@/stores/useCartStore';
 
-  const cartStore = useShoppingCartStore();
+  const cartStore = useCartStore();
   const props = defineProps({
     productData: Object
   })
@@ -53,7 +53,7 @@
       price: props.productData.price,
       amount: 1,
     }
-    cartStore.saveItem(newItem)
+    cartStore.addItem(newItem)
     router.push('/cart')
   }
 </script>

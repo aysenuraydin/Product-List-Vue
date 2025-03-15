@@ -10,7 +10,7 @@
 
     <a-table
       :columns="columns"
-      :data-source="productStore.items"
+      :data-source="pData"
       :rowKey="(record: any) => record.id"
       :scroll="{ x: 'max-content' }"
       :expand-column-width="50"
@@ -21,7 +21,7 @@
         pageSizeOptions: [5, 10, 20, 50],
         showSizeChanger: true,
         showQuickJumper: true,
-        total: productStore.items?.length,
+        total: pData?.length,
         onChange: changePagination,
         onShowSizeChange: changePaginationSize
         }"
@@ -31,7 +31,9 @@
           <a-image
           v-if="record.imgUrls && record.imgUrls[0]?.length > 0"
           :width="100"
-          :src="(record?.imgUrls[0] && record?.imgUrls[0]?.length > 0) ? record?.imgUrls[0] : 'https://dummyimage.com/600x500/ccc/aaa'"
+          :src="(record?.imgUrls[0] && record?.imgUrls[0]?.length > 0)
+              ? record?.imgUrls[0]
+              : 'https://dummyimage.com/600x500/ccc/aaa'"
           :alt="record.name"
           style="width: 100px; height: 100%; object-fit: contain; border-radius: 8px;"/>
           <ImageLorem v-else :width="100" class="rounded"/>
@@ -70,7 +72,7 @@
                 class="!w-full !bg-gray-800 relative !text-white !border-none">
                   <EditOutlined class="!absolute left-5 top-2"/> Edit
                 </a-button>
-                <a-button class="!w-full relative" @click="confirm2($event, record)" danger>
+                <a-button class="!w-full relative" @click="confirm2($event, record.id)" danger>
                   <DeleteOutlined class="!absolute left-5 top-2"/> Delete
                 </a-button>
             </div>
@@ -108,7 +110,7 @@
   <ProductModal
     :editItem="editItem"
     :visible="visible"
-    @update:visible="visible = $event"
+    @update:visible="changeVisible"
   />
 </template>
 <style>
@@ -120,7 +122,7 @@
   }
 </style>
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
+  import { ref, watch, onMounted } from 'vue';
   import Tag from 'primevue/tag';
   import ImageLorem from '@/components/ImageLorem.vue';
   import { useToast } from "primevue/usetoast";
@@ -129,19 +131,19 @@
   import ConfirmPopup from "primevue/confirmpopup";
   import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
   import ProductModal from '@/components/ProductModal.vue';
-  import { useProductStore } from '@/stores/productStore';
-  import { useCategoryStore } from '@/stores/categoryStore';
   import type { ICategory } from '@/models/ICategory';
   import type { IProduct } from '@/models/IProduct';
+  import { deleteProduct, getProducts, pLoading } from '@/services/productService';
+  import { categories } from '@/services/categoryService';
 
   const pageSize = ref(5);
   const currentPage = ref(1);
   const visible = ref(false);
-  const loading = ref(false);
   const confirm = useConfirm();
   const toast = useToast();
-  const productStore = useProductStore();
-  const categoryStore = useCategoryStore();
+  const loading = ref(false);
+  const pData = ref<IProduct[] | undefined>([])
+  const cData = ref<ICategory[] | undefined>([])
   const editItem = ref<IProduct>({} as IProduct);
 
   const getSeverity = (stockAmount:number) :string  =>
@@ -161,14 +163,14 @@
     { title: 'Action', width: 150, key: 'operation', fixed: 'right' }
   ];
   const getCategory = (id: string): ICategory => {
-    return categoryStore.items.find(c => c.id === id) ?? {
+    return cData.value?.find(c => c.id === id) ?? {
       id: '',
       name: "Unknown",
       createdAt: Date.now(),
       color: "gray"
     };
   };
-  const confirm2 = (event: MouseEvent, item: IProduct) => {
+  const confirm2 = (event: MouseEvent, item:string) => {
     confirm.require({
         target: event.currentTarget as HTMLElement,
         message: 'Do you want to delete this record?',
@@ -183,7 +185,9 @@
             severity: 'danger'
         },
         accept: () => {
-            productStore.deleteItem(item);
+            deleteProduct(item).then(()=> {
+              mounted();
+            });
             toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
         },
         reject: () => {
@@ -201,6 +205,10 @@
   const openEditModal = (item: IProduct) => {
     visible.value = true;
     editItem.value = { ...item };
+  };
+  const changeVisible = async(value: boolean) => {
+    visible.value = value;
+    await mounted();
   };
   watch(
     () => visible.value,
@@ -223,17 +231,15 @@
     },
     { immediate: true }
   );
+  onMounted(async () => {
+    await mounted();
+  });
+  const mounted = async() => {
+    pData.value= await getProducts();
+    cData.value= await categories();
+    loading.value = pLoading.value;
+  }
+  watch(pLoading, (newVal) => {
+    loading.value = newVal;
+  });
 </script>
-
-
-
-
-
-
-
-
-
-
-
-
-

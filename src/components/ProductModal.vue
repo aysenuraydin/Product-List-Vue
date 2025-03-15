@@ -6,7 +6,8 @@
   pt:mask:class="backdrop-blur-sm !border"
   class="md:w-[43rem]"
   modal>
-      <h3 class="text-2xl text-center">{{ data.id ? "Edit Product" : "Create Product" }}
+      <h3 class="text-2xl text-center">
+        {{ data.id ? "Edit Product" : "Create Product" }}
       </h3>
       <a-form
         :model="data"
@@ -73,7 +74,6 @@
             label="Category"
             name="category"
             :rules="[
-              { required: true, message: 'Please input your category!' },
               {
                 validator: (_: any, value: any, callback: Function) => {
                   if (!isSelected) {
@@ -86,7 +86,7 @@
             ]">
               <a-select
               v-model:value="data.categoryId"
-              :options="getCategories()"
+              :options="cData"
               :getPopupContainer="(triggerNode: HTMLElement) => triggerNode.parentNode" class="!w-full">
               </a-select>
           </a-form-item>
@@ -110,7 +110,7 @@
             label="Description"
             name="description"
             :rules="[{ required: true, message: 'Please input your description!' },
-            { min: 10, message: 'Must be max 10 characters!' }
+            { min: 10, max:1500, message: 'Description must be between 10 and 1000!' }
             ]">
           <Editor v-model="data.description" editorStyle="height: 150px" class="w-full"/>
         </a-form-item>
@@ -142,7 +142,7 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-  import { defineProps, defineEmits, reactive, ref, watch } from 'vue';
+  import { defineProps, defineEmits, reactive, ref, watch, onMounted } from 'vue';
   import Dialog from "primevue/dialog";
   import Button from "primevue/button";
   import ConfirmDialog from "primevue/confirmdialog";
@@ -152,30 +152,29 @@
   import Editor from "primevue/editor";
   import { PlusOutlined } from '@ant-design/icons-vue';
   import Tags from './Tags.vue';
-  import { useCategoryStore } from '@/stores/categoryStore';
-  import { useProductStore } from '@/stores/productStore';
+  import { addProduct, updateProduct } from '@/services/productService';
+  import type { IProduct } from '@/models/IProduct';
+  import { categories } from '@/services/categoryService';
 
-  const categoryStore = useCategoryStore();
-  const productStore = useProductStore();
   const previewVisible = ref(false);
   const previewImage = ref('');
   const previewTitle = ref('');
   const isSelected = ref(false);
 
-  const data = reactive({
+  const data = reactive<IProduct>({
     id: '',
     name: '',
     price: 0,
     description: '',
     categoryId: '' ,
-    raiting: 0,
-    category: 'Select Category',
+    raiting: 4,
     isConfirmed: false,
     createdAt: 0,
     stockAmount: 0,
     tags: [],
     imgUrls: [],
   });
+  const cData = ref<{ label: string; value: string; color: string }[]>([]);
 
   const fileList = ref(
     data.imgUrls?.map((img, index) => ({
@@ -191,14 +190,6 @@
     editItem: Object
   });
 
-  const getCategories = () => {
-    return categoryStore.items?.map(c=> ({
-      label: c.name,
-      value: c.id,
-      color:c.color
-    }))
-  };
-
   const handleCancel = () => {
     previewVisible.value = false;
     previewTitle.value = '';
@@ -213,8 +204,6 @@
     },
     { immediate: true }
   );
-
-
   watch(
     () => props.editItem,
     (newValue) => {
@@ -228,7 +217,6 @@
     },
     { immediate: true }
   );
-
   watch(
     () => data.imgUrls,
     (newImages) => {
@@ -243,7 +231,6 @@
   );
 
   const emit = defineEmits(["update:visible"]);
-
   const confirm = useConfirm();
   const toast = useToast();
 
@@ -261,8 +248,8 @@
   });
   };
 
-  const submitForm = (acceptCallback?: () => void) => {
-    productStore.saveItem(data);
+  const submitForm = async(acceptCallback?: () => void) => {
+    await submitProduct()
     emit('update:visible', false)
     if (acceptCallback) {
         acceptCallback();
@@ -270,5 +257,35 @@
   };
   const onFinishFailed = (errorInfo: void) => {
     console.log('Failed:', errorInfo);
+  };
+
+
+  onMounted(async () => {
+    await mounted();
+  });
+  const mounted = async () => {
+    const c = await categories() ?? [];
+
+    cData.value = c.map(c => ({
+      label: c.name,
+        value: c.id,
+        color:c.color
+    }));
+  };
+
+  const submitProduct = async () => {
+    try {
+      if(data.id!=""){
+        await updateProduct(data)
+      }
+      else {
+        data.raiting=4;
+        data.createdAt= Date.now()+ Math.floor(Math.random() * 1000);
+        await addProduct(data);
+      }
+      console.log("ürün eklendi");
+    } catch (error) {
+      console.error("Hata oluştu:", error);
+    }
   };
 </script>

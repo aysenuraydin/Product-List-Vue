@@ -26,7 +26,7 @@
     </Dialog>
   </div>
 </template>
-<script setup>
+<script setup lang="ts">
   import { defineProps, defineEmits } from 'vue';
   import Dialog from "primevue/dialog";
   import InputText from "primevue/inputtext";
