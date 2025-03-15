@@ -1,8 +1,11 @@
 <template>
   <a-divider orientation="left" class="!text-2xl !pb-5">Shopping Cart</a-divider>
   <div class="p-4 lg:flex !gap-x-10 w-full justify-around">
-    <div class="w-full">
-      <DataTable :value="productsStore?.items" tableStyle="width: 100%;" :emptyMessage="null">
+    <div class="w-full !relative">
+      <a-button class="!absolute right-3 top-2 !z-50 !text-red-400 !border-red-400"
+      @click="cartStore.clearCart()">Clear All</a-button>
+
+      <DataTable :value="cartStore?.items" tableStyle="width: 100%;" :emptyMessage="null">
       <template #empty>
         <div class="flex justify-center items-center py-6">
           <a-empty :image="simpleImage" description="Empty cart!" />
@@ -24,7 +27,12 @@
       </Column>
       <Column field="amount" header="Amount">
         <template #body="slotProps">
-          <a-input-number v-model:value="slotProps.data.amount" :min="1" :max="10" />
+          <a-input-number
+            @change="cartStore.updateItem(slotProps.data)"
+            v-model:value="slotProps.data.amount"
+            :min="1"
+            :max="10"
+            />
         </template>
       </Column>
       <Column>
@@ -58,20 +66,20 @@
   import { RouterLink } from 'vue-router';
   import { Empty } from 'ant-design-vue';
   import ImageLorem from '@/components/ImageLorem.vue';
-  import { useShoppingCartStore } from '@/stores/shoppingCartStore';
   import type { ICartItem } from '@/models/ICartItem';
+  import { useCartStore } from '@/stores/useCartStore';
 
   const simpleImage = Empty.PRESENTED_IMAGE_SIMPLE;
-  const productsStore = useShoppingCartStore();
+  const cartStore = useCartStore();
 
   const formatCurrency = (value: number) => {
       return value.toLocaleString('en-US', { style: 'currency', currency: 'USD' });
   };
   const subtotal = computed(() => {
-      return productsStore.items.reduce((acc, product) => acc + product.price * product.amount, 0);
+      return cartStore.items.reduce((acc, product) => acc + product.price * product.amount, 0);
   });
   const removeItem = (product: ICartItem) => {
-    productsStore.deleteItem(product);
+    cartStore.deleteItem(product);
   };
 </script>
 <style>

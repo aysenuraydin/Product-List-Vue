@@ -71,12 +71,11 @@
   import { useConfirm } from "primevue/useconfirm";
   import { useToast } from "primevue/usetoast";
   import ColorPicker from 'primevue/colorpicker';
-  import { useCategoryStore } from '@/stores/categoryStore';
+  import { addCategory, updateCategory } from '@/services/categoryService';
 
   const confirm = useConfirm();
   const toast = useToast();
   const emit = defineEmits(["update:visible"]);
-  const categoryStore = useCategoryStore();
   const data = reactive({
     id: '',
     name: '',
@@ -113,8 +112,20 @@
         }
     });
   };
-  const submitForm = (acceptCallback?: () => void) => {
-    categoryStore.saveItem(data);
+  const submitForm = async(acceptCallback?: () => void) => {
+    try {
+      if(data.id!=""){
+      await updateCategory(data)
+    }
+    else {
+      data.createdAt= Date.now()+ Math.floor(Math.random() * 1000);
+      await addCategory(data)
+    };
+
+      console.log("ürün eklendi");
+    } catch (error) {
+      console.error("Hata oluştu:", error);
+    }
     emit('update:visible', false);
     if (acceptCallback) {
         acceptCallback();

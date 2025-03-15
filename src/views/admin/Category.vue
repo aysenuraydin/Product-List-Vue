@@ -10,7 +10,7 @@
 
     <a-table
       :columns="columns"
-      :data-source="categoryStore.items"
+      :data-source="data"
       :rowKey="(record:any) => record.id"
       :scroll="{ x: 100 }"
       :expand-column-width="50"
@@ -21,7 +21,7 @@
         pageSizeOptions: [5, 10, 20, 50],
         showSizeChanger: true,
         showQuickJumper: true,
-        total: categoryStore.items?.length,
+        total: data?.length,
         onChange: changePagination,
         onShowSizeChange: changePaginationSize
         }"
@@ -47,7 +47,7 @@
                 class="!w-full !bg-gray-800 relative !text-white !border-none">
                   <EditOutlined class="!absolute left-5 top-2"/> Edit
                 </a-button>
-                <a-button class="!w-full relative" @click="confirm2($event, record)" danger>
+                <a-button class="!w-full relative" @click="confirm2($event, record.id)" danger>
                   <DeleteOutlined class="!absolute left-5 top-2"/> Delete
                 </a-button>
             </div>
@@ -59,27 +59,27 @@
   <CategoryModal
     :editItem="editItem ?? undefined"
     :visible="visible"
-    @update:visible="visible = $event"
+    @update:visible="changeVisible"
   />
 </template>
 <script setup lang="ts">
-  import { ref, watch } from 'vue';
+  import { onMounted, ref, watch } from 'vue';
   import { useToast } from "primevue/usetoast";
   import { useConfirm } from "primevue/useconfirm";
   import Toast from "primevue/toast";
   import ConfirmPopup from "primevue/confirmpopup";
   import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
-  import { useCategoryStore } from '@/stores/categoryStore';
   import type { ICategory } from '@/models/ICategory';
   import CategoryModal from '@/components/CategoryModal.vue';
+  import { categoryLoading, getCategories, deleteCategory } from '@/services/categoryService';
 
   const pageSize = ref(5);
   const currentPage = ref(1);
   const visible = ref(false);
-  const loading = ref(false);
   const confirm = useConfirm();
   const toast = useToast();
-  const categoryStore = useCategoryStore();
+  const loading = ref(false);
+  const data = ref<ICategory[] | undefined>([])
   const editItem = ref<ICategory>({} as ICategory);
 
   const columns = [
@@ -89,7 +89,7 @@
     { title: 'Action', width: 150, key: 'operation', fixed: 'right'}
   ];
 
-  const confirm2 = (event: MouseEvent, item:ICategory) => {
+  const confirm2 = (event: MouseEvent, item:string) => {
     confirm.require({
         target: event.currentTarget as HTMLElement,
         message: 'Do you want to delete this record?',
@@ -103,8 +103,10 @@
             label: 'Delete',
             severity: 'danger'
         },
-        accept: () => {
-            categoryStore.deleteItem(item);
+        accept: async() => {
+            deleteCategory(item).then(()=> {
+            mounted();
+            });
             toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
         },
         reject: () => {
@@ -123,6 +125,10 @@
     visible.value = true;
     editItem.value = { ...item };
   };
+  const changeVisible = async(value: boolean) => {
+    visible.value = value;
+    await mounted();
+  };
   watch(
     () => visible.value,
     (newVisible) => {
@@ -137,6 +143,16 @@
     },
     { immediate: true }
   );
+  onMounted(async () => {
+    await mounted();
+  });
+  const mounted = async() => {
+    data.value= await getCategories()
+    loading.value = categoryLoading.value;
+  }
+  watch(categoryLoading, (newVal) => {
+    loading.value = newVal;
+  });
 </script>
 <style>
   .ant-pagination-options {

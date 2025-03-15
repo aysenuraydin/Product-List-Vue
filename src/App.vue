@@ -2,7 +2,9 @@
   <Toast />
   <ConfirmPopup />
   <component :is="layout">
-    <RouterView />
+    <Suspense>
+    <router-view />
+  </Suspense>
   </component>
 </template>
 <script setup lang="ts">
@@ -10,7 +12,7 @@
   import ConfirmPopup from "primevue/confirmpopup";
   import { ref, watch, type Component } from 'vue'
   import { useRoute } from 'vue-router'
-  import { defineAsyncComponent } from 'vue'
+  import { defineAsyncComponent,markRaw } from 'vue'
 
   const route = useRoute();
   const layout = ref<Component | null>(null);
@@ -19,13 +21,18 @@
     () => route.meta.layout,
     (layoutName) => {
       if (layoutName) {
-        layout.value = defineAsyncComponent(() => import(`@/Layout/${layoutName}.vue`));
+        layout.value = markRaw(
+          defineAsyncComponent(() => import(`@/layout/${layoutName}.vue`))
+        )
       } else {
-        layout.value = defineAsyncComponent(() => import("@/Layout/MainLayout.vue"));
+        layout.value = markRaw(
+          defineAsyncComponent(() => import("@/layout/MainLayout.vue"))
+        )
       }
     },
     { immediate: true }
   );
+
 </script>
 <style scoped></style>
 

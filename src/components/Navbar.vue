@@ -10,8 +10,8 @@
         <a-dropdown class="!bg-[#00000000] !border-none !text-white">
           <template #overlay>
             <a-menu>
-                <RouterLink :to="{ name: 'product-list', query:{ query:link.name }}"
-                v-for="(link,index) in querys.items" :key="index">
+                <RouterLink :to="{ name: 'product-list', query:{ categoryName:link.name, categoryId:link.id  }}"
+                v-for="(link,index) in data" :key="index">
                   <a-menu-item>{{ link.name }}</a-menu-item>
                 </RouterLink>
             </a-menu>
@@ -37,13 +37,26 @@
   <LoginPopup :visible="visible" @update:visible="visible = $event" />
 </template>
 <script setup lang="ts">
-  import { ref } from "vue";
   import { RouterLink } from "vue-router";
   import { UserOutlined, DownOutlined, HomeOutlined, ShoppingCartOutlined } from "@ant-design/icons-vue";
   import Button from "primevue/button";
   import LoginPopup from "./LoginPopup.vue";
-  import { useCategoryStore } from "@/stores/categoryStore";
+  import { ref, watch, onMounted } from 'vue';
+  import type { ICategory } from '@/models/ICategory';
+  import { categories, categoryLoading } from '@/services/categoryService';
 
   const visible = ref(false);
-  const querys = useCategoryStore();
+  const data = ref<ICategory[] | undefined>([]);
+  const loading = ref(false);
+
+  onMounted(async () => {
+    await mounted();
+  });
+  const mounted = async() => {
+    data.value= await categories();
+    loading.value = categoryLoading.value;
+  }
+  watch(categoryLoading, (newVal) => {
+    loading.value = newVal;
+  });
 </script>
