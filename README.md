@@ -150,7 +150,7 @@ React Router is used to navigate between different views. You can set up React R
 
 Axios is used for handling HTTP requests.
 
-1.           Install Axios:
+1.               Install Axios:
 
     ```bash
     npm install axios
@@ -189,7 +189,7 @@ UUID are used for generating unique IDs. You can set up UUID by following these 
    app.mount("#app");
    ```
 
-## NANOID Integration
+## Nanoid Integration
 
 nanoid are used for generating unique IDs. You can set up UUID by following these steps:
 
