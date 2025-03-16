@@ -40,8 +40,6 @@
           }}
         </template>
         <template v-else-if="column.key === 'operation'">
-            <Toast />
-            <ConfirmPopup></ConfirmPopup>
             <div class="card flex flex-wrap gap-2 justify-center">
                 <a-button @click="openEditModal(record)"
                 class="!w-full !bg-gray-800 relative !text-white !border-none">
@@ -53,7 +51,6 @@
             </div>
         </template>
       </template>
-
     </a-table>
   </div>
   <CategoryModal
@@ -66,8 +63,6 @@
   import { onMounted, ref, watch } from 'vue';
   import { useToast } from "primevue/usetoast";
   import { useConfirm } from "primevue/useconfirm";
-  import Toast from "primevue/toast";
-  import ConfirmPopup from "primevue/confirmpopup";
   import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
   import type { ICategory } from '@/models/ICategory';
   import CategoryModal from '@/components/CategoryModal.vue';
@@ -105,7 +100,7 @@
         },
         accept: async() => {
             deleteCategory(item).then(()=> {
-            mounted();
+              mounted();
             });
             toast.add({ severity: 'info', summary: 'Confirmed', detail: 'Record deleted', life: 3000 });
         },

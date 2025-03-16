@@ -20,17 +20,31 @@
         </a-dropdown>
       </div>
       <a-space wrap class="sm:mt-0 mt-3 pb-2">
-        <a-button block v-if="true">
+        <div v-if="authStore.user" class="pt-2 mx-3">
+          <p>{{ authStore.user.email?.split('@')[0] }}</p>
+        </div>
+        <a-button block  v-if="authStore.user?.email==adminEmail">
           <RouterLink to="/admin/product" class="relative pl-5">
             <UserOutlined class="!absolute left-0 top-0" />Admin Panel
           </RouterLink>
         </a-button>
-        <a-button block v-if="true">
+        <a-button block>
           <RouterLink to="/cart" class="relative pl-4">
             <ShoppingCartOutlined class="!absolute left-0 top-0 scale-125"/>
           </RouterLink>
         </a-button>
-        <Button icon="pi pi-sign-in" @click="visible = true" class="!bg-white !text-black !border-none !outline-0"/>
+        <Button
+        v-if="!authStore.user"
+        icon="pi pi-sign-in"
+        @click="visible = true"
+        class="!bg-white !text-black !border-none !outline-0"
+        />
+        <Button
+        v-else
+        icon="pi pi-sign-out"
+        @click="authStore.logout();"
+        class="!bg-white !text-black !border-none !outline-0"
+        />
       </a-space>
     </div>
   </header>
@@ -39,6 +53,7 @@
 <script setup lang="ts">
   import { RouterLink } from "vue-router";
   import { UserOutlined, DownOutlined, HomeOutlined, ShoppingCartOutlined } from "@ant-design/icons-vue";
+  import { useAuthStore } from "@/stores/useAuthStore";
   import Button from "primevue/button";
   import LoginPopup from "./LoginPopup.vue";
   import { ref, watch, onMounted } from 'vue';
@@ -48,6 +63,8 @@
   const visible = ref(false);
   const data = ref<ICategory[] | undefined>([]);
   const loading = ref(false);
+  const authStore = useAuthStore();
+  const adminEmail= import.meta.env.VITE_FIREBASE_DATABASE_URL || ''
 
   onMounted(async () => {
     await mounted();

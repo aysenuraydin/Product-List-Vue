@@ -84,11 +84,13 @@
                 }
               }
             ]">
-              <a-select
-              v-model:value="data.categoryId"
-              :options="cData"
-              :getPopupContainer="(triggerNode: HTMLElement) => triggerNode.parentNode" class="!w-full">
-              </a-select>
+          <a-select
+          v-model:value="data.categoryId"
+          :options="cData"
+          :getPopupContainer="(triggerNode: HTMLElement) => triggerNode.parentNode" class="!w-full !border-3  rounded-lg"
+          :style="{borderColor:color}"
+          >
+          </a-select>
           </a-form-item>
           <a-form-item
             label="Confirm"
@@ -138,15 +140,18 @@
               </div>
           </template>
       </ConfirmDialog>
-      <Toast />
   </Dialog>
 </template>
+<style>
+  /* .ant-select-selector {
+    background-color: red !important;
+  } */
+</style>
 <script setup lang="ts">
   import { defineProps, defineEmits, reactive, ref, watch, onMounted } from 'vue';
   import Dialog from "primevue/dialog";
   import Button from "primevue/button";
   import ConfirmDialog from "primevue/confirmdialog";
-  import Toast from "primevue/toast";
   import { useConfirm } from "primevue/useconfirm";
   import { useToast } from "primevue/usetoast";
   import Editor from "primevue/editor";
@@ -160,6 +165,7 @@
   const previewImage = ref('');
   const previewTitle = ref('');
   const isSelected = ref(false);
+  const color = ref('#ffffff');
 
   const data = reactive<IProduct>({
     id: '',
@@ -194,13 +200,18 @@
     previewVisible.value = false;
     previewTitle.value = '';
   };
-
   watch(
     () => data.categoryId,
     (newValue) => {
       if (newValue) {
         isSelected.value=true;
       }
+      const category = cData.value.find(i=>i.value==data.categoryId);
+      console.log(category?.color)
+
+       color.value=(category?.color==undefined)
+                  ? color.value= '#fff'
+                :'#'+category?.color;
     },
     { immediate: true }
   );
@@ -229,6 +240,11 @@
     },
     { deep: true, immediate: true }
   );
+  // const changeColor = () =>{
+  //   const category = cData.value.find(i=>i.value=data.categoryId);
+  //   color.value= '#'+category?.color;
+  //   console.log(color.value)
+  // }
 
   const emit = defineEmits(["update:visible"]);
   const confirm = useConfirm();

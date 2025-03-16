@@ -65,8 +65,6 @@
           }}
         </template>
         <template v-else-if="column.key === 'operation'">
-            <Toast />
-            <ConfirmPopup></ConfirmPopup>
             <div class="card flex flex-wrap gap-2 justify-center">
                 <a-button @click="openEditModal(record)"
                 class="!w-full !bg-gray-800 relative !text-white !border-none">
@@ -127,8 +125,6 @@
   import ImageLorem from '@/components/ImageLorem.vue';
   import { useToast } from "primevue/usetoast";
   import { useConfirm } from "primevue/useconfirm";
-  import Toast from "primevue/toast";
-  import ConfirmPopup from "primevue/confirmpopup";
   import { EditOutlined, DeleteOutlined, PlusOutlined } from '@ant-design/icons-vue';
   import ProductModal from '@/components/ProductModal.vue';
   import type { ICategory } from '@/models/ICategory';
