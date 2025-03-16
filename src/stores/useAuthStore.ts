@@ -1,8 +1,8 @@
-// stores/authStore.ts
 import { defineStore } from "pinia";
 import { ref } from "vue";
 import { auth } from "@/plugins/FirebaseConfig";
 import { signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged } from "firebase/auth";
+import session from '@/plugins/session';
 
 export const useAuthStore = defineStore("auth", () => {
   const user = ref(auth.currentUser);
@@ -12,7 +12,13 @@ export const useAuthStore = defineStore("auth", () => {
   });
 
   const login = async (email: string, password: string) => {
-    await signInWithEmailAndPassword(auth, email, password);
+    const response = await signInWithEmailAndPassword(auth, email, password);
+
+    if (response && response.user) {
+      const token = await response.user.getIdToken();
+      session.setSession(token);
+  }
+
   };
 
   const register = async (email: string, password: string) => {
@@ -21,6 +27,7 @@ export const useAuthStore = defineStore("auth", () => {
 
   const logout = async () => {
     await signOut(auth);
+    session.clearSession();
   };
 
   return { user, login, register, logout };

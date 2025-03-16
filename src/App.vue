@@ -32,7 +32,6 @@
     },
     { immediate: true }
   );
-
 </script>
 <style scoped></style>
 

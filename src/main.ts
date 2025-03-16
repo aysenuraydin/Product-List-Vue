@@ -10,7 +10,6 @@ import router from './router';
 import 'ant-design-vue/dist/reset.css';
 import registerPlugins from './plugins';
 
-
 const app = createApp(App)
 app.use(createPinia());
 app.use(router);

@@ -34,6 +34,11 @@
             </div>
           </a-tag>
         </template>
+        <template v-else-if="column.key === 'name'">
+          <RouterLink :to="{ name: 'product-list', query:{ categoryName:record.name, categoryId:record.id  }}">
+          <span class="underline text-gray-600"> {{ record.name }} </span>
+          </RouterLink>
+        </template>
         <template v-else-if="column.key === 'createdAt'">
           {{
             new Date(record.createdAt).toISOString().replace("T", " ").substring(0, 19)
