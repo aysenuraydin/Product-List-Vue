@@ -150,23 +150,23 @@ React Router is used to navigate between different views. You can set up React R
 
 Axios is used for handling HTTP requests.
 
-1.               Install Axios:
+1. Install Axios:
 
-    ```bash
-    npm install axios
-    ```
+   ```bash
+   npm install axios
+   ```
 
-2.  Create an Axios instance (axiosInstance.js):
+2. Create an Axios instance (axiosInstance.js):
 
-    ```javascript
-    import axios from "axios";
-    const api = axios.create({
-      baseURL: "https://api.example.com",
-      headers: { "Content-Type": "application/json" },
-    });
+   ```javascript
+   import axios from "axios";
+   const api = axios.create({
+     baseURL: "https://api.example.com",
+     headers: { "Content-Type": "application/json" },
+   });
 
-    export default api;
-    ```
+   export default api;
+   ```
 
 ## Ant Design Integration
 
