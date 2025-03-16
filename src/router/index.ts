@@ -22,7 +22,8 @@ const router = createRouter({
       path: '/admin',
       name: 'admin',
       meta: {
-        layout: 'AdminLayout'
+        layout: 'AdminLayout',
+        authorize: true
       },
       children: [
         {

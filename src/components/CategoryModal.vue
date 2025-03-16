@@ -32,8 +32,13 @@
           name="color"
           :rules="[{ required: true, message: 'Please input your color!' }]"
         >
-          <a-input v-model:value="data.color" />
-          <div class="md:scale-[205%] md:translate-[calc(53%)] md:h-[22rem] pt-1 scale-[175%] translate-[calc(38%)] h-[19rem]"><ColorPicker v-model="data.color" inline style="width: 100%;"/></div>
+          <a-input v-model:value="data.color" :style="{
+              backgroundColor: `#${data.color}99`,
+              borderColor: `#${data.color}`
+            }"/>
+          <div class="md:scale-[205%] md:translate-[calc(53%)] md:h-[22rem] pt-1 scale-[175%] translate-[calc(38%)] h-[19rem]">
+            <ColorPicker v-model="data.color" inline style="width: 100%;"/>
+          </div>
         </a-form-item>
 
         <a-form-item :wrapper-col="{ offset: 4 }">
@@ -59,7 +64,6 @@
               </div>
           </template>
       </ConfirmDialog>
-      <Toast />
   </Dialog>
 </template>
 <script setup lang="ts">
@@ -67,7 +71,6 @@
   import Dialog from "primevue/dialog";
   import Button from "primevue/button";
   import ConfirmDialog from "primevue/confirmdialog";
-  import Toast from "primevue/toast";
   import { useConfirm } from "primevue/useconfirm";
   import { useToast } from "primevue/usetoast";
   import ColorPicker from 'primevue/colorpicker';
