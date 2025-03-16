@@ -207,7 +207,6 @@
         isSelected.value=true;
       }
       const category = cData.value.find(i=>i.value==data.categoryId);
-      console.log(category?.color)
 
        color.value=(category?.color==undefined)
                   ? color.value= '#fff'
@@ -240,11 +239,6 @@
     },
     { deep: true, immediate: true }
   );
-  // const changeColor = () =>{
-  //   const category = cData.value.find(i=>i.value=data.categoryId);
-  //   color.value= '#'+category?.color;
-  //   console.log(color.value)
-  // }
 
   const emit = defineEmits(["update:visible"]);
   const confirm = useConfirm();

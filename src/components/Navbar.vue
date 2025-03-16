@@ -64,7 +64,7 @@
   const data = ref<ICategory[] | undefined>([]);
   const loading = ref(false);
   const authStore = useAuthStore();
-  const adminEmail= import.meta.env.VITE_FIREBASE_DATABASE_URL || ''
+  const adminEmail= import.meta.env.VITE_FIREBASE_ADMIN_EMAIL|| ''
 
   onMounted(async () => {
     await mounted();
