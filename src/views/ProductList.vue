@@ -49,16 +49,13 @@
     await mounted();
   });
   const mounted = async() => {
-    // data.value= await getProductsByCategory(route.query.categoryId as string || "");
-    // route.query.categoryId as string || ""
-    // data.value= await getProducts();
     const categoryId = route.query.categoryId ? String(route.query.categoryId) : "";
-
-  if (categoryId) {
-    data.value = await getProductsByCategory(categoryId);
-  } else {
-    data.value = await getProducts();
-  }
+    if (categoryId) {
+      data.value = await getProductsByCategory(categoryId);
+    } else {
+      data.value = await getProducts();
+      data.value = data.value?.reverse()
+    }
   }
   watch(pLoading, (newVal) => {
     loading.value = newVal;
