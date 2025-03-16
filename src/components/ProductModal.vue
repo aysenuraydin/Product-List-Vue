@@ -22,19 +22,8 @@
         :disabled="false"
       >
       <div class="flex flex-col sm:flex-row">
-        <div class="file-card p-3 min-w-32 sm:w-40 sm:max-h-[34rem] max-h-[8rem] overflow-scroll border border-gray-300 rounded-2xl sm:mx-5  scrollbar-hide">
-          <a-upload
-            v-model:file-list="fileList"
-            list-type="picture-card"
-          >
-            <div v-if="fileList?.length < 8">
-              <plus-outlined />
-              <div style="margin-top: 8px">Upload</div>
-            </div>
-          </a-upload>
-          <a-modal :open="previewVisible" :title="previewTitle" :footer="null" @cancel="handleCancel">
-            <img alt="example" style="width: 100%" :src="previewImage" />
-          </a-modal>
+        <div class="file-card p-3 min-w-32 sm:w-40 sm:max-h-[35rem] max-h-[8rem] overflow-scroll border border-gray-300 rounded-2xl sm:mx-5  scrollbar-hide">
+          <UploadImage v-model="data.imgUrls" />
         </div>
         <div class="w-full">
           <a-form-item
@@ -148,7 +137,7 @@
   } */
 </style>
 <script setup lang="ts">
-  import { defineProps, defineEmits, reactive, ref, watch, onMounted } from 'vue';
+  import { reactive, ref, watch, onMounted } from 'vue';
   import Dialog from "primevue/dialog";
   import Button from "primevue/button";
   import ConfirmDialog from "primevue/confirmdialog";
@@ -160,6 +149,7 @@
   import { addProduct, updateProduct } from '@/services/productService';
   import type { IProduct } from '@/models/IProduct';
   import { categories } from '@/services/categoryService';
+  import UploadImage from './UploadImage.vue'
 
   const previewVisible = ref(false);
   const previewImage = ref('');
@@ -208,7 +198,7 @@
       }
       const category = cData.value.find(i=>i.value==data.categoryId);
 
-       color.value=(category?.color==undefined)
+      color.value=(category?.color==undefined)
                   ? color.value= '#fff'
                 :'#'+category?.color;
     },
@@ -289,7 +279,7 @@
         await updateProduct(data)
       }
       else {
-        data.raiting=4;
+        data.raiting=0;
         data.createdAt= Date.now()+ Math.floor(Math.random() * 1000);
         await addProduct(data);
       }

@@ -14,13 +14,3 @@ export default function registerPlugins(app: App) {
   app.use(ConfirmationService);
 }
 
-
-
-// // import * as AntIcons from "@ant-design/icons-vue";
-
-
-// // Object.keys(AntIcons).forEach((key) => {
-// //   app.component(key, AntIcons[key]);
-// // });
-
-

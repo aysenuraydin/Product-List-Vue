@@ -31,7 +31,7 @@
         <div class="flex gap-x-4 items-start">
           <h1 class="text-2xl">{{ pData?.name }}</h1>
           <RouterLink :to="{ name: 'product-list', query:{ categoryName: getCategory(pData?.categoryId??'0')?.name ,categoryId: pData?.categoryId}}">
-            <a-tag :color="getCategory(pData?.categoryId??'0')?.color">
+            <a-tag :color="'#'+getCategory(pData?.categoryId??'0')?.color">
               <div class="!text-[15px] !px-4 !py-[5px]">
                 {{ getCategory(pData?.categoryId??'0')?.name }}
               </div>

@@ -67,7 +67,7 @@
   </Dialog>
 </template>
 <script setup lang="ts">
-  import { defineProps, defineEmits, reactive, watch } from 'vue';
+  import { reactive, watch } from 'vue';
   import Dialog from "primevue/dialog";
   import Button from "primevue/button";
   import ConfirmDialog from "primevue/confirmdialog";

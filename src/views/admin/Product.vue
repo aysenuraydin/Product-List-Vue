@@ -38,6 +38,11 @@
           style="width: 100px; height: 100%; object-fit: contain; border-radius: 8px;"/>
           <ImageLorem v-else :width="100" class="rounded"/>
         </template>
+        <template v-else-if="column.key === 'name'">
+          <RouterLink :to="'/product-detail/'+record.id">
+          <span class="underline text-gray-600"> {{ record.name }}</span>
+          </RouterLink>
+        </template>
         <template v-else-if="column.key === 'price'">
           $ {{ record.price }}
         </template>
@@ -131,6 +136,7 @@
   import type { IProduct } from '@/models/IProduct';
   import { deleteProduct, getProducts, pLoading } from '@/services/productService';
   import { categories } from '@/services/categoryService';
+  import { RouterLink } from 'vue-router';
 
   const pageSize = ref(5);
   const currentPage = ref(1);

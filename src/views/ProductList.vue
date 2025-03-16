@@ -60,8 +60,7 @@
   watch(pLoading, (newVal) => {
     loading.value = newVal;
   });
-  watch(route, async(newVal) => {
-    console.log(newVal.query.categoryName);
+  watch(route, async() => {
     await mounted();
   });
 </script>
